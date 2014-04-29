@@ -19,5 +19,7 @@ setup(name='mako_scaffold',
       entry_points = """
       [console_scripts]
       mako-scaffold = mako_scaffold.command:main
+      [mako.scaffold]
+      simple-package = mako_scaffold.scaffolds.simple_package:Package
       """,
       )
