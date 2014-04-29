@@ -1,0 +1,5 @@
+2014-04-19  podhmo  <podhmo@beproud.jp>
+	* version 0.0.1
+	* support inherited class on ModelSeed definition
+	* support mixin on ModelSeed definition
+

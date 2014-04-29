@@ -1,0 +1,23 @@
+from setuptools import setup, find_packages
+requires = [
+    "mako"
+    ]
+
+setup(name='mako_scaffold',
+      version='0.0.1',
+      description='scaffold',
+      long_description="", 
+      author='podhmo',
+      classifiers=[
+          'Programming Language :: Python',
+          'Programming Language :: Python :: 3'
+      ],
+      package_dir={'': '.'},
+      packages=find_packages('.'),
+      install_requires = requires,
+      test_suite="mako_scaffold.tests", 
+      entry_points = """
+      [console_scripts]
+      mako-scaffold = mako_scaffold.command:main
+      """,
+      )
