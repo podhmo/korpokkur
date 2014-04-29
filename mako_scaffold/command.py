@@ -11,11 +11,15 @@ def out(s):
     sys.stdout.write(s)
     sys.stdout.write("\n")
 
-def get_app(setting={"entry_points_name": "mako.scaffold"}):
+def get_app(setting=
+            {"entry_points_name": "mako.scaffold", 
+             "input.prompt": "{word}? :"
+                 }):
     config = Configurator(setting=setting)
     config.include("mako_scaffold.scaffoldgetter")
     config.include("mako_scaffold.walker")
     config.include("mako_scaffold.detector")
+    config.include("mako_scaffold.input")
     return config #xxx:
 
 
@@ -25,16 +29,20 @@ def listing(args):
     for k, cls in cmd.all_scaffolds().items():
         out("{k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
 
+
 def creation(args):
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+
     app = get_app()
     getter = app.activate_plugin("scaffoldgetter")
     scaffold_cls = getter.get_scaffold(args.name)
-    print(scaffold_cls)
-
+    scaffold = scaffold_cls()
+    input = app.activate_plugin("input.cli")
     detector = app.activate_plugin("detector")
-    walker = app.activate_plugin("walker", detector)
-    walker.walk(".")
-    print(walker)
+    walker = app.activate_plugin("walker", input, detector)
+    walker.walk(scaffold.source_directory, ".")
+
     # if scaffold_cls is None:
     #     return
     pass

@@ -40,35 +40,38 @@ class Configurator(object):
             if hasattr(module, "includeme"):
                 module.includeme(self)
 
-    def add_plugin(self, installname, plugin, iface=None, name=""):
+    def add_plugin(self, installname, plugin, iface=None, categoryname=None):
         if iface is None:
             try:
                 iface = iter(implementedBy(plugin)).__next__()
             except StopIteration:
                 raise Exception("plugin {} is not implemented by any interface".format(plugin))
-        plugin_factory = self.maybe_dotted(plugin)
-        self.registry.adapters.register([IConfigurator], iface, name, plugin_factory)
+        if categoryname is None:
+            categoryname = installname
 
-        logger.info("install: %s -- %s", installname, plugin_factory)
-        self.registry.installed_plugin[installname] = iface
+        plugin_factory = self.maybe_dotted(plugin)
+        self.registry.adapters.register([IConfigurator], iface, installname, plugin_factory)
+
+        logger.info("install: %s -- %s (category:%s)", installname, plugin_factory.__name__, categoryname)
+        self.registry.installed_plugin[installname] = (iface, categoryname)
+
 
     def activate_plugin(self, installname, *args, **kwargs):
-        name = kwargs.get("name", "")
-        iface = self.registry.installed_plugin[installname]
-        plugin_class = self.registry.adapters.lookup([IConfigurator], iface, name)
+        iface, categoryname = self.registry.installed_plugin[installname]
+        plugin_class = self.registry.adapters.lookup([IConfigurator], iface, installname)
         if plugin_class is None:
             raise Exception("plugin {nam} not found(iface={iface})".format(nam=installname, iface=iface))
         plugin = plugin_class.create_from_setting(self.setting, *args, **kwargs)
 
-        logger.info("activate: %s -- %s", installname, plugin)
-        self.registry.activated_plugin[installname] = plugin
+        logger.info("activate: %s -- %s", categoryname, plugin)
+        self.registry.activated_plugin[categoryname] = plugin
         return plugin
 
-    def __getattr__(self, installname):
+    def __getattr__(self, categoryname):
         try:
-            plugin = self.registry.activated_plugin[installname]
+            plugin = self.registry.activated_plugin[categoryname]
         except KeyError:
-            raise AttributeError(installname)
-        setattr(self, installname, plugin) #cache
+            raise AttributeError(categoryname)
+        setattr(self, categoryname, plugin) #cache
         return plugin
 
