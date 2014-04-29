@@ -4,7 +4,7 @@ from zope.interface import (
     Attribute
 )
 
-class IMakoScaffoldTemplate(Interface):
+class IScaffoldTemplate(Interface):
     __doc__ = Attribute("description text of scaffold")
 
 class IConfigurator(Interface):
@@ -15,17 +15,17 @@ class IConfigurator(Interface):
         pass
 
 class IPlugin(Interface):
-    def create_from_setting(setting):
+    def create_from_setting(setting): #classmethod
         pass
 
 
 ###
 
 class ISpecialObjectDetector(Interface):
-    def is_template_directory(dirname):
+    def is_rewrite_directory(dirname):
         """ template directory? (default: +package+)"""
 
-    def is_template_file(filename):
+    def is_rewrite_file(filename):
         """ template file? (default: filename.mako.tmpl)"""
 
 class IScaffoldGetter(Interface):
@@ -33,4 +33,8 @@ class IScaffoldGetter(Interface):
         pass
 
     def get_scaffold(expected_name):
+        pass
+
+class ITreeWalker(Interface):
+    def walk(root):
         pass

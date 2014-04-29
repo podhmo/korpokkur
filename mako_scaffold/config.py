@@ -3,6 +3,8 @@ from zope.interface.registry import Components
 from zope.interface import implementer, implementedBy
 from .interfaces import IConfigurator
 import pkg_resources
+import logging
+logger = logging.getLogger(__name__)
 
 _registry = None
 def get_registry():
@@ -46,17 +48,27 @@ class Configurator(object):
                 raise Exception("plugin {} is not implemented by any interface".format(plugin))
         plugin_factory = self.maybe_dotted(plugin)
         self.registry.adapters.register([IConfigurator], iface, name, plugin_factory)
+
+        logger.info("install: %s -- %s", installname, plugin_factory)
         self.registry.installed_plugin[installname] = iface
 
-    def activate_plugin(self, installname, name="", *args, **kwargs):
+    def activate_plugin(self, installname, *args, **kwargs):
+        name = kwargs.get("name", "")
         iface = self.registry.installed_plugin[installname]
         plugin_class = self.registry.adapters.lookup([IConfigurator], iface, name)
+        if plugin_class is None:
+            raise Exception("plugin {nam} not found(iface={iface})".format(nam=installname, iface=iface))
         plugin = plugin_class.create_from_setting(self.setting, *args, **kwargs)
+
+        logger.info("activate: %s -- %s", installname, plugin)
         self.registry.activated_plugin[installname] = plugin
         return plugin
 
     def __getattr__(self, installname):
-        plugin = self.registry.activated_plugin[installname]
+        try:
+            plugin = self.registry.activated_plugin[installname]
+        except KeyError:
+            raise AttributeError(installname)
         setattr(self, installname, plugin) #cache
         return plugin
 
