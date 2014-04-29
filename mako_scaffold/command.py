@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
-import pkg_resources
 import argparse
-from collections import OrderedDict
+from mako_scaffold.config import Configurator
 import sys
 
 def err(s):
@@ -12,38 +11,35 @@ def out(s):
     sys.stdout.write(s)
     sys.stdout.write("\n")
 
-class MakoScaffoldCommand(object):
-    def __init__(self, entry_points_name="mako.scaffold", out=err):
-        self.entry_points_name = entry_points_name
-        self.out = out
-
-    def all_scaffolds(self):
-        scaffolds = OrderedDict()
-        eps = list(pkg_resources.iter_entry_points(self.entry_points_name))
-        for entry in eps:
-            try:
-                scaffold_class = entry.load()
-                scaffolds[entry.name] = scaffold_class
-            except Exception as e: # pragma: no cover
-                self.out('Warning: could not load entry point %s (%s: %s)' % (
-                    entry.name, e.__class__.__name__, e))
-        return scaffolds
-
-
-def get_command():
-    return MakoScaffoldCommand("mako.scaffold")
+def get_app(setting={"entry_points_name": "mako.scaffold"}):
+    config = Configurator(setting=setting)
+    config.include("mako_scaffold.scaffoldgetter")
+    return config #xxx:
 
 def listing(args):
-    cmd = get_command()
+    app = get_app()
+    cmd = app.activate_plugin("scaffoldgetter")
     for k, cls in cmd.all_scaffolds().items():
         out("{k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
+
+def creation(args):
+    # scaffold_cls = get_command().get_scaffold(args.name)
+    # if scaffold_cls is None:
+    #     return
+    pass
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("program")
     sub_parsers = parser.add_subparsers()
+
     list_parser = sub_parsers.add_parser("list")
     list_parser.set_defaults(func=listing)
+
+    create_parser = sub_parsers.add_parser("create")
+    create_parser.add_argument("name")
+    create_parser.set_defaults(func=creation)
+
     args = parser.parse_args(sys.argv)
     return args.func(args)
 
