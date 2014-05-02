@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 from zope.interface.registry import Components
 from zope.interface import implementer, implementedBy
-from .interfaces import IConfigurator
+from zope.interface.verify import verifyClass
+from .interfaces import IConfigurator, IPlugin
 import pkg_resources
 import logging
 logger = logging.getLogger(__name__)
@@ -27,6 +28,14 @@ class Configurator(object):
         if not hasattr(self.registry, "activated_plugin"):
             self.registry.activated_plugin = {}
 
+    @property
+    def installed_plugin_repository(self):
+        return self.registry.installed_plugin
+
+    @property
+    def activated_plugin_repository(self):
+        return self.registry.activated_plugin
+
     def maybe_dotted(self, xxx):
         if hasattr(xxx, "encode"):
             return import_symbol(xxx)
@@ -40,17 +49,30 @@ class Configurator(object):
             if hasattr(module, "includeme"):
                 module.includeme(self)
 
-    def add_plugin(self, installname, plugin, iface=None, categoryname=None):
+    def lookup_implementation(self, iface, name):
+        return self.registry.adapters.lookup([IConfigurator], iface, name)
+
+    def register_implementation(self, iface, name, plugin_factory):
+        self.registry.adapters.register([IConfigurator], iface, name, plugin_factory)
+
+    def add_plugin(self, installname, plugin, iface=None, categoryname=None, strict=True):
         if iface is None:
             try:
                 iface = iter(implementedBy(plugin)).__next__()
+                if iface is IPlugin:
+                    iface = iter(implementedBy(plugin)).__next__() #xxx
             except StopIteration:
                 raise Exception("plugin {} is not implemented by any interface".format(plugin))
+
+        if strict:
+            implementer(iface)(plugin)
+            verifyClass(iface, plugin)
+
         if categoryname is None:
             categoryname = installname
 
         plugin_factory = self.maybe_dotted(plugin)
-        self.registry.adapters.register([IConfigurator], iface, installname, plugin_factory)
+        self.register_implementation(iface, installname, plugin_factory)
 
         logger.info("install: %s -- %s (category:%s)", installname, plugin_factory.__name__, categoryname)
         self.registry.installed_plugin[installname] = (iface, categoryname)
@@ -58,7 +80,7 @@ class Configurator(object):
 
     def activate_plugin(self, installname, *args, **kwargs):
         iface, categoryname = self.registry.installed_plugin[installname]
-        plugin_class = self.registry.adapters.lookup([IConfigurator], iface, installname)
+        plugin_class = self.lookup_implementation(iface, installname)
         if plugin_class is None:
             raise Exception("plugin {nam} not found(iface={iface})".format(nam=installname, iface=iface))
         plugin = plugin_class.create_from_setting(self.setting, *args, **kwargs)
