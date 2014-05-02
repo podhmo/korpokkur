@@ -19,7 +19,6 @@ class Boo(object):
     def create_from_setting(cls, settings):
         return cls()
 
-
 class ConfigurationPluginRegistrationIntegrationTests(unittest.TestCase):
     def _getTarget(self):
         from mako_scaffold.config import Configurator
@@ -51,6 +50,27 @@ class ConfigurationPluginRegistrationIntegrationTests(unittest.TestCase):
         ## so, configurator has function about result
         self.assertEqual(target.foo, result)
 
+class ConfigrationPluginMaybeDottedTests(unittest.TestCase):
+    def _callFUT(self, *args, **kwargs):
+        from mako_scaffold.config import Configurator
+        from zope.interface.registry import Components
+        config = Configurator({}, registry=Components("test"))
+        return config.maybe_dotted(*args, **kwargs)
+
+    def test_object(self):
+        from mako_scaffold.interfaces import IPlugin
+        result = self._callFUT(IPlugin)
+        self.assertEqual(result, IPlugin)
+
+    def test_string__return_object(self):
+        from mako_scaffold.interfaces import IPlugin
+        result = self._callFUT("mako_scaffold.interfaces:IPlugin")
+        self.assertEqual(result, IPlugin)
+
+    def test_string_relative__return_object(self):
+        from mako_scaffold.interfaces import IPlugin
+        result = self._callFUT("..interfaces:IPlugin")
+        self.assertEqual(result, IPlugin)
 
 class ConfiguratorAddPluginTests(unittest.TestCase):
     def _getTarget(self):

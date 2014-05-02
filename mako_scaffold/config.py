@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import re
 from zope.interface.registry import Components
 from zope.interface import implementer, implementedBy
 from zope.interface.verify import verifyClass
@@ -36,8 +37,35 @@ class Configurator(object):
     def activated_plugin_repository(self):
         return self.registry.activated_plugin
 
+    relative_rx = re.compile("^\.+")
     def maybe_dotted(self, xxx):
         if hasattr(xxx, "encode"):
+            m = self.relative_rx.search(xxx)
+            ## relative import support. this is uggly.
+            if m:
+                logger.warn("maybe_dotted: relative import is experimental support.: %s", xxx)
+                star_size = len(m.group(0))
+                if star_size > 1:
+                    import inspect
+                    import sys
+                    caller_module = inspect.getmodule(inspect.currentframe().f_back)
+                    if hasattr(caller_module, "__path__"):
+                        filename = caller_module.__path__
+                    else:
+                        filename = pkg_resources.resource_filename(caller_module.__name__, "")
+                    word_list = filename.split("/")
+                    for _ in range(star_size-1):
+                        word_list.pop()
+
+                    root_module_path = "/".join(word_list)
+                    matched_module_name = None
+                    for name, m in sys.modules.items():
+                        if hasattr(m, "__path__") and any(p == root_module_path for p in m.__path__):
+                            matched_module_name = name
+                            break
+                    if matched_module_name is None:
+                        raise Exception("oops not found {}".format(xxx))
+                    xxx = "{}.{}".format(matched_module_name, xxx.lstrip("."))
             return import_symbol(xxx)
         return xxx
 
