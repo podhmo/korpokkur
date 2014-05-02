@@ -51,10 +51,13 @@ class ConfigurationPluginRegistrationIntegrationTests(unittest.TestCase):
         self.assertEqual(target.foo, result)
 
 class ConfigrationPluginMaybeDottedTests(unittest.TestCase):
-    def _callFUT(self, *args, **kwargs):
+    def _makeOne(self, *args, **kwargs):
         from mako_scaffold.config import Configurator
         from zope.interface.registry import Components
-        config = Configurator({}, registry=Components("test"))
+        return Configurator({}, registry=Components("test"))
+
+    def _callFUT(self, *args, **kwargs):
+        config = self._makeOne()
         return config.maybe_dotted(*args, **kwargs)
 
     def test_object(self):
@@ -71,6 +74,31 @@ class ConfigrationPluginMaybeDottedTests(unittest.TestCase):
         from mako_scaffold.interfaces import IPlugin
         result = self._callFUT("..interfaces:IPlugin")
         self.assertEqual(result, IPlugin)
+
+    def test_string_relative__return_object2(self):
+        from mako_scaffold.interfaces import IPlugin
+        def closure():
+            result = self._callFUT("..interfaces:IPlugin")
+            self.assertEqual(result, IPlugin)
+        closure()
+
+    def test_string_relative__return_object3(self):
+        from mako_scaffold.interfaces import IPlugin
+        target = self._makeOne()
+        def closure():
+            result = target.maybe_dotted("..interfaces:IPlugin")
+            self.assertEqual(result, IPlugin)
+        closure()
+
+    def test_string_relative__return_object4(self):
+        from mako_scaffold.interfaces import IPlugin
+        target = self._makeOne()
+        def closure():
+            from mako_scaffold.tests import call
+            result = call(target, "maybe_dotted", "..interfaces:IPlugin")
+            self.assertEqual(result, IPlugin)
+        closure()
+
 
 class ConfiguratorAddPluginTests(unittest.TestCase):
     def _getTarget(self):

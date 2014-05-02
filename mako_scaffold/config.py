@@ -50,22 +50,23 @@ class Configurator(object):
                     import sys
                     caller_module = inspect.getmodule(inspect.currentframe().f_back)
                     if hasattr(caller_module, "__path__"):
-                        filename = caller_module.__path__
+                        filename_list = caller_module.__path__
                     else:
-                        filename = pkg_resources.resource_filename(caller_module.__name__, "")
-                    word_list = filename.split("/")
-                    for _ in range(star_size-1):
-                        word_list.pop()
+                        filename_list = [pkg_resources.resource_filename(caller_module.__name__, "")]
+                    for filename in filename_list:
+                        word_list = filename.split("/")
+                        for _ in range(star_size-1):
+                            word_list.pop()
 
-                    root_module_path = "/".join(word_list)
-                    matched_module_name = None
-                    for name, m in sys.modules.items():
-                        if hasattr(m, "__path__") and any(p == root_module_path for p in m.__path__):
-                            matched_module_name = name
+                        root_module_path = "/".join(word_list)
+                        matched_module_name = None
+                        for name, m in sys.modules.items():
+                            if hasattr(m, "__path__") and any(p == root_module_path for p in m.__path__):
+                                matched_module_name = name
+                                break
+                        if matched_module_name:
+                            xxx = "{}.{}".format(matched_module_name, xxx.lstrip("."))
                             break
-                    if matched_module_name is None:
-                        raise Exception("oops not found {}".format(xxx))
-                    xxx = "{}.{}".format(matched_module_name, xxx.lstrip("."))
             return import_symbol(xxx)
         return xxx
 
