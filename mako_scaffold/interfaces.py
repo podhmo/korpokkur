@@ -22,7 +22,6 @@ class IPlugin(Interface):
 
 
 ###
-
 class IInput(Interface):
     def load(word, reload=False):
         """ load from cache if not found read from anywhere"""
@@ -51,3 +50,8 @@ class IScaffoldGetter(Interface):
 class ITreeWalker(Interface):
     def walk(root):
         pass
+
+class IEmitter(Interface):
+    def emit(template, input): #input is IInput
+        pass
+
