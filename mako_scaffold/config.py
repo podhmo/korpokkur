@@ -38,6 +38,7 @@ class Configurator(object):
         return self.registry.activated_plugin
 
     relative_rx = re.compile("^\.+")
+    module_cache = {}
     def maybe_dotted(self, xxx):
         if hasattr(xxx, "encode"):
             m = self.relative_rx.search(xxx)
@@ -49,11 +50,17 @@ class Configurator(object):
                     import inspect
                     import sys
                     caller_module = inspect.getmodule(inspect.currentframe().f_back)
+
                     if hasattr(caller_module, "__path__"):
                         filename_list = caller_module.__path__
                     else:
                         filename_list = [pkg_resources.resource_filename(caller_module.__name__, "")]
+
                     for filename in filename_list:
+                        if filename in self.module_cache:
+                            xxx = "{}.{}".format(self.module_cache[filename], xxx.lstrip("."))
+                            break
+
                         word_list = filename.split("/")
                         for _ in range(star_size-1):
                             word_list.pop()
@@ -65,6 +72,7 @@ class Configurator(object):
                                 matched_module_name = name
                                 break
                         if matched_module_name:
+                            self.module_cache[filename] = matched_module_name
                             xxx = "{}.{}".format(matched_module_name, xxx.lstrip("."))
                             break
             return import_symbol(xxx)
