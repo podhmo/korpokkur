@@ -6,62 +6,54 @@ from zope.interface import implementer
 from mako_scaffold.interfaces import ITreeWalker, IPlugin
 import os
 import os.path
-import shutil
+
 
 ## see: mako_scaffold.interfaces:ITreeWalker
 @implementer(ITreeWalker, IPlugin)
 class StructualWalker(object):
     @classmethod
-    def create_from_setting(cls, setting, input,  detector, emitter):
-        return cls(input, detector, emitter)
+    def create_from_setting(cls, setting, input,  detector, emitter, reproduction):
+        return cls(input, detector, emitter, reproduction)
 
-    def __init__(self, input, detector, emitter):
+    def __init__(self, input, detector, emitter, reproduction):
         self.input = input
         self.detector = detector
         self.emitter = emitter
+        self.reproduction = reproduction
 
     ## todo:move
-    def convert_path(self, root, r, name, dst):
+    def convert_to_modified_path(self, root, r, name, dst):
         reldir = r.replace(root, dst)
         return os.path.join(reldir, name)
 
-    def rewrite_name(self, name):
-        pattern, varname = self.detector.get_rewrite_patterns(name)
-        replaced = name.replace(pattern, self.input.load(varname))
-        logger.debug("rewrite: %s -> %s", name, replaced)
-        return replaced
+    def get_modified_name(self, name):
+        if not self.detector.is_rewrite_name(name):
+            return name
+        else:
+            pattern, varname = self.detector.get_rewrite_patterns(name)
+            replaced = name.replace(pattern, self.input.load(varname))
+            logger.debug("rewrite: %s -> %s", name, replaced)
+            return replaced
 
     def on_dirname(self, root, r, d, dst):
-        if self.detector.is_rewrite_name(d):
-            name = self.rewrite_name(d)
-        else:
-            name = d
-        dirpath = self.convert_path(root, r, name, dst)
-        if not os.path.lexists(dirpath):
-            os.makedirs(dirpath)
+        name = self.get_modified_name(d)
+        dirpath = self.convert_to_modified_path(root, r, name, dst)
+        self.prepare_for_copy_directory(dirpath)
         return name
 
     def on_filename(self, root, r, f, dst):
-        if self.detector.is_rewrite_name(f):
-            name = self.rewrite_name(f)
-        else:
-            name = f
+        name = self.get_modified_name(f)
 
         src_path = os.path.join(r, f)
-        dst_path = self.convert_path(root, r, name, dst)
+        dst_path = self.convert_to_modified_path(root, r, name, dst)
 
-        dir_path = os.path.dirname(dst_path)
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
+        self.reproduction.prepare_for_copy_file(dst_path)
 
         if not self.detector.is_rewrite_file(f):
-            shutil.copy(src_path, dst_path)
+            self.reproduction.copy_file(src_path, dst_path)
         else:
             dst_path = self.detector.replace_rewrite_file(dst_path)
-            with open(dst_path, "w") as wf:
-                with open(src_path) as rf:
-                    template = rf.read()
-                    wf.write(self.emitter.emit(template, self.input))
+            self.reproduction.modified_copy_file(src_path, dst_path)
         return name
 
     def walk(self, root, dst):

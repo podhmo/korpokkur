@@ -58,3 +58,15 @@ class IEmitter(Interface):
     def emit(template, input): #input is IInput
         pass
 
+class IReproduction(Interface):
+    def prepare_for_copy_file(dst_path):
+        pass
+
+    def prepare_for_copy_directory(dir_path):
+        pass
+
+    def copy_file(src_path, dst_path):
+        pass
+
+    def modified_copy_file(src_path, dst_path):
+        pass
