@@ -3,15 +3,14 @@ import unittest
 import os.path
 
 class DummyReproduction(object):
-    def __init__(self, src_root, dst_root):
+    def __init__(self, src_root):
         self.src_root = src_root
-        self.dst_root = dst_root
         self.makedirs = []
         self.files = []
         self.modified_files = []
 
     def _simplify(self, path):
-        return path.replace(self.src_root, ":S:").replace(self.dst_root, ":D:")
+        return path.replace(self.src_root, ":S:")
 
     def prepare_for_copy_file(self, dst_path):
         self.makedirs.append(self._simplify(os.path.dirname(dst_path)))
@@ -41,14 +40,14 @@ class FileTreeWalkerTests(unittest.TestCase):
     def test_it(self):
         from mako_scaffold import testing
         with testing.temporary_environment() as src_dir:
-            dst_dir = "/my/private"
+            dst_dir = "/my"
 
             structure_data = {"+package+": {"setup.py.tmpl": "${package}", "sample.txt": "yay"}}
             testing.file_structure_from_dict(src_dir, structure_data)
 
             from mako_scaffold.input import DictInput
             input = DictInput({"package": "foo"})
-            reproduction = DummyReproduction(src_dir, dst_dir)
+            reproduction = DummyReproduction(src_dir)
             target = self._makeOne(input, reproduction)
             target.walk(os.path.join(src_dir, "+package+"), dst_dir)
 
@@ -56,9 +55,9 @@ class FileTreeWalkerTests(unittest.TestCase):
             self.assertEqual(len(reproduction.modified_files), 1)
 
             self.assertEqual(reproduction.files[0][0], ":S:/+package+/sample.txt")
-            self.assertEqual(reproduction.files[0][1], ":D:/foo/sample.txt")
+            self.assertEqual(reproduction.files[0][1], "/my/foo/sample.txt")
 
             self.assertEqual(reproduction.modified_files[0][0], ":S:/+package+/setup.py.tmpl")
-            self.assertEqual(reproduction.modified_files[0][1], ":D:/foo/setup.py")
+            self.assertEqual(reproduction.modified_files[0][1], "/my/foo/setup.py")
 
 
