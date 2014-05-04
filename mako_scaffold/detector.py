@@ -19,7 +19,7 @@ class SpecialObjectDetector(object):
         return filename.endswith(".tmpl")
 
     def replace_rewrite_file(self, filename):
-        return filename.rstrip(".tmpl")
+        return filename[:-5] #xxx
 
     file_rx = re.compile(r"\+([^+]+?)\+")
     def get_rewrite_patterns(self, filename):

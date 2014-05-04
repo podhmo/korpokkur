@@ -21,6 +21,7 @@ def get_app(setting=
     config.include("mako_scaffold.detector")
     config.include("mako_scaffold.input")
     config.include("mako_scaffold.emitter")
+    config.include("mako_scaffold.reproduction")
     return config #xxx:
 
 
@@ -40,9 +41,10 @@ def creation(args):
     scaffold_cls = getter.get_scaffold(args.name)
     scaffold = scaffold_cls()
     input = app.activate_plugin("input.cli")
-    emitter = app.activate_plugin("emitter.mako", input)
+    emitter = app.activate_plugin("emitter.mako")
+    reproduction = app.activate_plugin("reproduction", emitter, input)
     detector = app.activate_plugin("detector")
-    walker = app.activate_plugin("walker", input, detector, emitter)
+    walker = app.activate_plugin("walker", input, detector, reproduction)
     walker.walk(scaffold.source_directory, ".")
 
 
@@ -60,7 +62,8 @@ def main():
 
     args = parser.parse_args(sys.argv)
     try:
-        return args.func(args)
+        func = args.func
     except AttributeError:
         parser.error("unknown action")
+    return func(args)
 

@@ -82,7 +82,7 @@ def _render(template, callable_, args, data, as_unicode=False):
 @implementer(IEmitter)
 class MakoEmitter(object):
     @classmethod
-    def create_from_setting(cls, settings, input):
+    def create_from_setting(cls, settings):
         env_factory = settings.get("env_factory", InputEnv)
         return cls(env_factory)
 
@@ -92,7 +92,6 @@ class MakoEmitter(object):
     def emit(self, template, input):
         env = self.env_factory(input)
         return InputEnvTemplate(template).render_by_env(env)
-
 
 def includeme(config):
     config.add_plugin("emitter.mako", MakoEmitter, categoryname="emitter")

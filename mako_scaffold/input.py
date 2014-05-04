@@ -85,3 +85,4 @@ class CommandLineInput(object):
 ## todo: from file?, ini file?
 def includeme(config):
     config.add_plugin("input.cli", CommandLineInput, categoryname="input")
+    config.add_plugin("input.dict", CommandLineInput, categoryname="input")
