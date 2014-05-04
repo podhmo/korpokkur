@@ -42,7 +42,19 @@ def creation(args):
     scaffold = scaffold_cls()
     input = app.activate_plugin("input.cli")
     emitter = app.activate_plugin("emitter.mako")
-    reproduction = app.activate_plugin("reproduction", emitter, input)
+    reproduction = app.activate_plugin("reproduction.physical", emitter, input)
+    detector = app.activate_plugin("detector")
+    walker = app.activate_plugin("walker", input, detector, reproduction)
+    walker.walk(scaffold.source_directory, ".")
+
+def scanning(args):
+    app = get_app()
+    getter = app.activate_plugin("scaffoldgetter")
+    scaffold_cls = getter.get_scaffold(args.name)
+    scaffold = scaffold_cls()
+    input = app.activate_plugin("input.cli")
+    emitter = app.activate_plugin("emitter.mako")
+    reproduction = app.activate_plugin("reproduction.simulation", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
     walker.walk(scaffold.source_directory, ".")
@@ -59,6 +71,10 @@ def main():
     create_parser = sub_parsers.add_parser("create")
     create_parser.add_argument("name")
     create_parser.set_defaults(func=creation)
+
+    scan_parser = sub_parsers.add_parser("scan")
+    scan_parser.add_argument("name")
+    scan_parser.set_defaults(func=scanning)
 
     args = parser.parse_args(sys.argv)
     try:
