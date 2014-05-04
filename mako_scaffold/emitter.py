@@ -93,3 +93,6 @@ class MakoEmitter(object):
         env = self.env_factory(input)
         return InputEnvTemplate(template).render_by_env(env)
 
+
+def includeme(config):
+    config.add_plugin("emitter.mako", MakoEmitter, categoryname="emitter")

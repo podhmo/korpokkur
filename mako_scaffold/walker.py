@@ -12,12 +12,13 @@ import shutil
 @implementer(ITreeWalker, IPlugin)
 class StructualWalker(object):
     @classmethod
-    def create_from_setting(cls, setting, input,  detector):
-        return cls(input, detector)
+    def create_from_setting(cls, setting, input,  detector, emitter):
+        return cls(input, detector, emitter)
 
-    def __init__(self, input, detector):
+    def __init__(self, input, detector, emitter):
         self.input = input
         self.detector = detector
+        self.emitter = emitter
 
     ## todo:move
     def convert_path(self, root, r, name, dst):
@@ -25,7 +26,7 @@ class StructualWalker(object):
         return os.path.join(reldir, name)
 
     def rewrite_name(self, name):
-        pattern, varname = self.detector.rewrite_target_from_filename(name)
+        pattern, varname = self.detector.get_rewrite_patterns(name)
         replaced = name.replace(pattern, self.input.load(varname))
         logger.debug("rewrite: %s -> %s", name, replaced)
         return replaced
@@ -45,12 +46,22 @@ class StructualWalker(object):
             name = self.rewrite_name(f)
         else:
             name = f
+
+        src_path = os.path.join(r, f)
+        dst_path = self.convert_path(root, r, name, dst)
+
+        dir_path = os.path.dirname(dst_path)
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
         if not self.detector.is_rewrite_file(f):
-            shutil.copy(os.path.join(r, f),
-                        self.convert_path(root, r, name, dst) 
-                    )
+            shutil.copy(src_path, dst_path)
         else:
-            print("rewrite!")
+            dst_path = self.detector.replace_rewrite_file(dst_path)
+            with open(dst_path, "w") as wf:
+                with open(src_path) as rf:
+                    template = rf.read()
+                    wf.write(self.emitter.emit(template, self.input))
         return name
 
     def walk(self, root, dst):

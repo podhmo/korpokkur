@@ -56,7 +56,7 @@ class CommandLineInput(object):
 
     def load_with_default(self, word, default=None):
         try:
-            return self.read(word)
+            return self.load(word)
         except KeyError:
             return default
 

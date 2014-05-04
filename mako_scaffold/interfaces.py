@@ -37,7 +37,10 @@ class ISpecialObjectDetector(Interface):
     def is_rewrite_file(filename):
         """ template file? (default: filename.mako.tmpl)"""
 
-    def rewrite_target_from_filename(filename):
+    def replace_rewrite_file(filename):
+        pass
+
+    def get_rewrite_patterns(filename):
         pass
 
 class IScaffoldGetter(Interface):
@@ -48,7 +51,7 @@ class IScaffoldGetter(Interface):
         pass
 
 class ITreeWalker(Interface):
-    def walk(root):
+    def walk(root, dst):
         pass
 
 class IEmitter(Interface):
