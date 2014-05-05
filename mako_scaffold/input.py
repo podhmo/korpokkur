@@ -32,6 +32,11 @@ class DictInput(object):
     def __iter__(self):
         return iter(self.D)
 
+    @property
+    def loaded_map(self):
+        return self.D
+
+
 ## see: mako_scaffold.interfaces:IInput
 @implementer(IInput)
 class CommandLineInput(object):
@@ -45,6 +50,7 @@ class CommandLineInput(object):
         self.output_port = output_port
         self.prompt = prompt
         self.cache = {}
+        self.loaded_map = {}
 
     def load(self, word, reload=False):
         if reload:
@@ -66,6 +72,7 @@ class CommandLineInput(object):
 
         value = self.input_port.readline().rstrip()
         self.cache[word] = value
+        self.loaded_map[word] = value
         return value
 
     def save(self, word, value):
@@ -81,6 +88,8 @@ class CommandLineInput(object):
 
     def __iter__(self):
         return iter(self.cache)
+
+
 
 ## todo: from file?, ini file?
 def includeme(config):

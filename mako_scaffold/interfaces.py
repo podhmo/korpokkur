@@ -29,6 +29,7 @@ class IInput(Interface):
     def read(word):
         """ read data"""
 
+    loaded_map = Attribute("loaded pair store")
 
 class ISpecialObjectDetector(Interface):
     def is_rewrite_name(dirname):

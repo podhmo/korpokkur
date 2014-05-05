@@ -56,6 +56,11 @@ def scanning(args):
     walker = app.activate_plugin("walker", input, detector, reproduction)
     walker.walk(scaffold.source_directory, ".")
 
+    ##xxxx
+    print("----------------------------------------")
+    import json
+    print(json.dumps(input.loaded_map, indent=2, ensure_ascii=False))
+
 def setup_logging(args):
     if args.logging is None:
         return
