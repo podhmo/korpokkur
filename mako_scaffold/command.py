@@ -105,14 +105,14 @@ def main(sys_args=sys.argv):
     create_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     create_parser.add_argument("-c", "--config")
     create_parser.add_argument("name")
-    create_parser.add_argument("destination", default=".")
+    create_parser.add_argument("destination", default=".", nargs="?")
     create_parser.set_defaults(func=creation)
 
     scan_parser = sub_parsers.add_parser("scan")
     scan_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     scan_parser.add_argument("-c", "--config")
     scan_parser.add_argument("name")
-    scan_parser.add_argument("destination", default=".")
+    scan_parser.add_argument("destination", default=".", nargs="?")
     scan_parser.set_defaults(func=scanning)
 
     args = parser.parse_args(sys_args)
