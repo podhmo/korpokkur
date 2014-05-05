@@ -44,7 +44,7 @@ def creation(args):
     reproduction = app.activate_plugin("reproduction.physical", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
-    walker.walk(scaffold.source_directory, ".")
+    walker.walk(scaffold.source_directory, args.destination)
 
 def scanning(args):
     app = get_app()
@@ -57,7 +57,7 @@ def scanning(args):
     reproduction = app.activate_plugin("reproduction.simulation", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
-    walker.walk(scaffold.source_directory, ".")
+    walker.walk(scaffold.source_directory, args.destination)
 
     ##xxxx
     import json
@@ -92,26 +92,30 @@ def setup_logging(app, args):
         level = getattr(logging, args.logging)
         logging.basicConfig(level=level)
 
-def main():
+def main(sys_args=sys.argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("program")
-    parser.add_argument("--logging", choices=["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"])
     sub_parsers = parser.add_subparsers()
 
     list_parser = sub_parsers.add_parser("list")
+    list_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     list_parser.set_defaults(func=listing)
 
     create_parser = sub_parsers.add_parser("create")
+    create_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     create_parser.add_argument("-c", "--config")
     create_parser.add_argument("name")
+    create_parser.add_argument("destination", default=".")
     create_parser.set_defaults(func=creation)
 
     scan_parser = sub_parsers.add_parser("scan")
+    scan_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     scan_parser.add_argument("-c", "--config")
     scan_parser.add_argument("name")
+    scan_parser.add_argument("destination", default=".")
     scan_parser.set_defaults(func=scanning)
 
-    args = parser.parse_args(sys.argv)
+    args = parser.parse_args(sys_args)
     try:
         func = args.func
     except AttributeError:
