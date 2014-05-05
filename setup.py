@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 requires = [
-    "mako"
+    "mako", 
+    "zope.interface"
     ]
 
 setup(name='mako_scaffold',
