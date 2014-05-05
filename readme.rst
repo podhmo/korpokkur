@@ -29,7 +29,7 @@ create
     ## foo package is generated
 
 sometime, it's annoying that asking via interactive shell when unknown setting is found.
-so, enable to passing value by config file.
+so, enable to pass value by config file.
 
 .. code:: python
 
