@@ -33,9 +33,6 @@ def listing(args):
 
 
 def creation(args):
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-
     app = get_app()
     getter = app.activate_plugin("scaffoldgetter")
     scaffold_cls = getter.get_scaffold(args.name)
@@ -59,10 +56,18 @@ def scanning(args):
     walker = app.activate_plugin("walker", input, detector, reproduction)
     walker.walk(scaffold.source_directory, ".")
 
+def setup_logging(args):
+    if args.logging is None:
+        return
+    else:
+        import logging
+        level = getattr(logging, args.logging)
+        logging.basicConfig(level=level)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("program")
+    parser.add_argument("--logging", choices=["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"])
     sub_parsers = parser.add_subparsers()
 
     list_parser = sub_parsers.add_parser("list")
@@ -77,6 +82,7 @@ def main():
     scan_parser.set_defaults(func=scanning)
 
     args = parser.parse_args(sys.argv)
+    setup_logging(args)
     try:
         func = args.func
     except AttributeError:
