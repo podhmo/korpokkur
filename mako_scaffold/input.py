@@ -8,33 +8,34 @@ from mako_scaffold.interfaces import IInput
 ## see: mako_scaffold.interfaces:IInput
 @implementer(IInput)
 class DictInput(object):
+    @classmethod
+    def create_from_setting(cls, settings, data):
+        return cls(data)
+
     def __init__(self, D):
-        self.D = D
+        self.cache = D.copy()
+        self.loaded_map = D
 
     def load_with_default(self, k, default=None):
-        return self.D.get(k, default)
+        return self.cache.get(k, default)
 
     def load(self, k, reload=False):
-        return self.D[k]
+        return self.cache[k]
 
     def read(self, k):
-        return self.D[k]
+        return self.cache[k]
 
     def save(self, k, v):
-        self.D[k] = v
+        self.cache[k] = v
 
     def copy(self):
-        self.__class__(self.D.copy())
+        self.__class__(self.cache.copy())
 
     def update(self, d):
-        self.D.update(d)
+        self.cache.update(d)
 
     def __iter__(self):
-        return iter(self.D)
-
-    @property
-    def loaded_map(self):
-        return self.D
+        return iter(self.cache)
 
 
 ## see: mako_scaffold.interfaces:IInput
@@ -94,4 +95,4 @@ class CommandLineInput(object):
 ## todo: from file?, ini file?
 def includeme(config):
     config.add_plugin("input.cli", CommandLineInput, categoryname="input")
-    config.add_plugin("input.dict", CommandLineInput, categoryname="input")
+    config.add_plugin("input.dict", DictInput, categoryname="input")
