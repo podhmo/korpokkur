@@ -3,12 +3,13 @@ korpokkur
 
 korpokkur
 
+(only support 2.7 and 3.3
+
 korpokkur has several subcommands. list below.
 
 - list
 - create
 - scan
-
 
 
 list
