@@ -50,6 +50,8 @@ class Scaffold(object):
                     yield subsub
 
     def walk(self, walker, dst, overwrite=True):
+        if hasattr(self.template, "cache"):
+            walker.input.update(self.template.cache)
         walker.walk(self.source_directory, dst, overwrite=overwrite)
         for sub_scaffold in self.iterate_children():
             sub_scaffold.walk(walker, dst, overwrite=overwrite)
