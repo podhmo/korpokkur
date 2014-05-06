@@ -3,13 +3,14 @@ import unittest
 
 class TranslatorTests(unittest.TestCase):
     def test_it(self):
+        from mako_scaffold.testing import DummyScaffold
         from mako_scaffold.emitter import (
             MakoEmitter, 
             InputEnv
         )
         from mako_scaffold.input import DictInput
 
-        input = DictInput({"name": "foo"})
+        input = DictInput(DummyScaffold(), {"name": "foo"})
         template = "myname is ${name}"
 
         target = MakoEmitter(InputEnv)
@@ -17,6 +18,7 @@ class TranslatorTests(unittest.TestCase):
         self.assertEqual(result, "myname is foo")
 
     def test_input_commandline(self):
+        from mako_scaffold.testing import DummyScaffold
         from mako_scaffold.emitter import (
             MakoEmitter, 
             InputEnv
@@ -26,7 +28,7 @@ class TranslatorTests(unittest.TestCase):
         input_port = StringIO("foo\n")
         output_port = StringIO()
 
-        input = CommandLineInput(input_port, output_port, "{word}?:")
+        input = CommandLineInput(DummyScaffold(), input_port, output_port, "{word}?:")
         template = "myname is ${name}"
 
         target = MakoEmitter(InputEnv)
@@ -34,6 +36,7 @@ class TranslatorTests(unittest.TestCase):
         self.assertEqual(result, "myname is foo")
 
     def test_input_commandline__with_deftemplate(self):
+        from mako_scaffold.testing import DummyScaffold
         from mako_scaffold.emitter import (
             MakoEmitter, 
             InputEnv
@@ -43,7 +46,7 @@ class TranslatorTests(unittest.TestCase):
         input_port = StringIO("foo\n")
         output_port = StringIO()
 
-        input = CommandLineInput(input_port, output_port, "{word}?:")
+        input = CommandLineInput(DummyScaffold(), input_port, output_port, "{word}?:")
         template = """\
 <%def name="greeting(name)">
 myname is ${name}

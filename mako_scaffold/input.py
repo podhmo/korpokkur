@@ -9,10 +9,11 @@ from mako_scaffold.interfaces import IInput
 @implementer(IInput)
 class DictInput(object):
     @classmethod
-    def create_from_setting(cls, settings, data):
-        return cls(data)
+    def create_from_setting(cls, settings, scaffold, data):
+        return cls(scaffold, data)
 
-    def __init__(self, D):
+    def __init__(self, scaffold, D):
+        self.scaffold = scaffold
         self.cache = D.copy()
         self.loaded_map = D
 
@@ -29,7 +30,7 @@ class DictInput(object):
         self.cache[k] = v
 
     def copy(self):
-        self.__class__(self.cache.copy())
+        self.__class__(self.scaffold, self.cache.copy())
 
     def update(self, d):
         self.cache.update(d)
@@ -43,10 +44,11 @@ class DictInput(object):
 class CommandLineInput(object):
     prompt = "{word}?:"
     @classmethod
-    def create_from_setting(cls, settings):
-        return cls(sys.stdin, sys.stdout, prompt=settings["input.prompt"])
+    def create_from_setting(cls, settings, scaffold):
+        return cls(sys.stdin, sys.stdout, prompt=settings["input.prompt"]) ##TODO: get prompt via scaffold
 
-    def __init__(self, input_port, output_port, prompt):
+    def __init__(self, scaffold, input_port, output_port, prompt):
+        self.scaffold = scaffold
         self.input_port = input_port
         self.output_port = output_port
         self.prompt = prompt
@@ -80,7 +82,7 @@ class CommandLineInput(object):
         self.cache[word] = value
 
     def copy(self):
-        o = self.__class__(self.input_port, self.output_port, self.prompt)
+        o = self.__class__(self.scaffold, self.input_port, self.output_port, self.prompt)
         o.cache = self.cache.copy()
         return o
 

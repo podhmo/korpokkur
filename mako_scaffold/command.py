@@ -36,10 +36,10 @@ def listing(args):
 def creation(args):
     app = get_app()
     setup_logging(app, args)
-    input = setup_input(app, args)
     getter = app.activate_plugin("scaffoldgetter")
     scaffold_cls = getter.get_scaffold(args.name)
     scaffold = scaffold_cls()
+    input = setup_input(app, args, scaffold)
     emitter = app.activate_plugin("emitter.mako")
     reproduction = app.activate_plugin("reproduction.physical", emitter, input)
     detector = app.activate_plugin("detector")
@@ -49,10 +49,10 @@ def creation(args):
 def scanning(args):
     app = get_app()
     setup_logging(app, args)
-    input = setup_input(app, args)
     getter = app.activate_plugin("scaffoldgetter")
     scaffold_cls = getter.get_scaffold(args.name)
     scaffold = scaffold_cls()
+    input = setup_input(app, args, scaffold)
     emitter = app.activate_plugin("emitter.mako")
     reproduction = app.activate_plugin("reproduction.simulation", emitter, input)
     detector = app.activate_plugin("detector")
@@ -65,15 +65,15 @@ def scanning(args):
     out(json.dumps(input.loaded_map, indent=2, ensure_ascii=False))
 
 
-def setup_input(app, args):
+def setup_input(app, args, scaffold):
     if args.config is None:
-        return app.activate_plugin("input.cli")
+        return app.activate_plugin("input.cli", scaffold)
     elif args.config.endswith(".json"):
         #xxx
         import json
         with open(args.config) as rf:
             data = json.load(rf)
-            return app.activate_plugin("input.dict", data)
+            return app.activate_plugin("input.dict", scaffold, data)
     elif args.config.endswith(".ini"):
         try:
             from configparser import ConfigParser
@@ -82,7 +82,7 @@ def setup_input(app, args):
         parser = ConfigParser()
         assert parser.read(args.config)
         data = dict(parser.items("scaffold"))
-        return app.activate_plugin("input.dict", data)
+        return app.activate_plugin("input.dict", scaffold, data)
 
 def setup_logging(app, args):
     if args.logging is None:

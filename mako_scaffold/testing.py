@@ -32,3 +32,30 @@ D = {"foo": {"setup.py": "testest",
             os.makedirs(os.path.dirname(root))
             with open(root, "w") as wf:
                 wf.write(D)
+
+## dummy object
+
+class DummyScaffold(object):
+    pass
+
+class DummyReproduction(object):
+    def __init__(self, src_root):
+        self.src_root = src_root
+        self.makedirs = []
+        self.files = []
+        self.modified_files = []
+
+    def _simplify(self, path):
+        return path.replace(self.src_root, ":S:")
+
+    def prepare_for_copy_file(self, dst_path):
+        self.makedirs.append(self._simplify(os.path.dirname(dst_path)))
+
+    def prepare_for_copy_directory(self, dir_path):
+        self.makedirs.append(self._simplify(dir_path))
+
+    def copy_file(self, src_path, dst_path):
+        self.files.append([self._simplify(src_path), self._simplify(dst_path)])
+
+    def modified_copy_file(self, src_path, dst_path):
+        self.modified_files.append([self._simplify(src_path), self._simplify(dst_path)])
