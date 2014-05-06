@@ -8,11 +8,13 @@ class IScaffoldTemplate(Interface):
     __doc__ = Attribute("description text of scaffold")
     source_directory = Attribute("source directory for template")
     expected_words = Attribute("key and description list of rendering values")
+    template_engine = Attribute("template engine")
     __dro__ = Attribute("delegation resolution order") #optional
 
 class IScaffold(Interface):
     source_directory = Attribute("source directory for template")
     expected_words = Attribute("key and description list of rendering values")
+
     def iterate_children():
         pass
 

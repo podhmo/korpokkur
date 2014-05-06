@@ -21,7 +21,6 @@ def get_app(setting=
     config.include("korpokkur.walker")
     config.include("korpokkur.detector")
     config.include("korpokkur.input")
-    config.include("korpokkur.emitter.mako")
     config.include("korpokkur.reproduction")
     return config #xxx:
 
@@ -48,7 +47,7 @@ def creation(args):
     scaffold_cls = getter.get_scaffold(args.name)
     scaffold = app.activate_plugin("scaffold:factory", scaffold_cls)
     input = setup_input(app, args, scaffold)
-    emitter = app.activate_plugin("emitter.mako")
+    emitter = setup_emitter(app, args, scaffold)
     reproduction = app.activate_plugin("reproduction.physical", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
@@ -66,7 +65,7 @@ def scanning(args):
     scaffold_cls = getter.get_scaffold(args.name)
     scaffold = app.activate_plugin("scaffold:factory", scaffold_cls)
     input = setup_input(app, args, scaffold)
-    emitter = app.activate_plugin("emitter.mako")
+    emitter = setup_emitter(app, args, scaffold)
     reproduction = app.activate_plugin("reproduction.simulation", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
@@ -80,7 +79,12 @@ def scanning(args):
     sys.exit(0)
 
 
-
+##xxxx:
+def setup_emitter(app, args, scaffold):
+    engine_name = getattr(scaffold.template, "template_engine", "mako")
+    assert engine_name in ("mako", "jinja2")
+    app.include("korpokkur.emitter.{}".format(engine_name))
+    return app.activate_plugin("emitter.{}".format(engine_name))
 
 def setup_input(app, args, scaffold):
     if args.config is None:

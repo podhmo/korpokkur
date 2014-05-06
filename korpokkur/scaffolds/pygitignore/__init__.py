@@ -12,3 +12,4 @@ class Package(object):
     expected_words = {
         "package": ("package name", "sample")
     }
+    template_engine = "mako"

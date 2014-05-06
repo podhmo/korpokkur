@@ -18,4 +18,4 @@ class Template(object):
     }
     cache = {"replace_package": "+package+"}
     __dro__ = ["korpokkur.scaffolds.pygitignore:Package"] #todo:validation
-
+    template_engine = "mako"

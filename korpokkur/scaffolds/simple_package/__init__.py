@@ -16,3 +16,4 @@ class Package(object):
         "version": ("version number for project", "0.0")
     }
     __dro__ = ["korpokkur.scaffolds.pygitignore:Package"] #todo:validation
+    template_engine = "mako"
