@@ -69,7 +69,7 @@ class SimulateReproduction(object):
         return self.prepare_for_copy_directory(dir_path)
 
     def prepare_for_copy_directory(self, dir_path):
-        message = "d[c]:{}".format(dir_path)
+        message = "d[c]: {}".format(dir_path)
         if not message in self.output:
             self.output.add(message)
             err(message)
