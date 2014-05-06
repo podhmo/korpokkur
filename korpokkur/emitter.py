@@ -31,7 +31,7 @@ class InputEnv(Mapping):
         return iter(self.input)
 
     def __len__(self):
-        raise Exception("not support")
+        return len(self.input.cache) #xxx:
 
 class InputEnvTemplate(MakoTemplate):
     def render_by_env(self, env):

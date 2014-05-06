@@ -6,6 +6,10 @@ import tempfile
 import contextlib
 import shutil
 from .reproduction import FileConflict
+from .compat import (
+    FileNotFoundError, 
+    bytes_
+)
 
 @contextlib.contextmanager
 def temporary_environment(cleanup=True):
@@ -27,12 +31,12 @@ D = {"foo": {"setup.py": "testest",
             file_structure_from_dict(os.path.join(root, name), val)
     else:
         try:
-            with open(root, "w") as wf:
-                wf.write(D)
+            with open(root, "wb") as wf:
+                wf.write(bytes_(D))
         except FileNotFoundError:
             os.makedirs(os.path.dirname(root))
-            with open(root, "w") as wf:
-                wf.write(D)
+            with open(root, "wb") as wf:
+                wf.write(bytes_(D))
 
 ## dummy object
 class DummyScaffold(object):

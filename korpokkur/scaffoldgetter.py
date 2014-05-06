@@ -46,7 +46,8 @@ class Scaffold(object):
                 iterated.add(self.template)
                 sub = self.__class__(template, lookup=self.lookup)
                 yield sub
-                yield from sub.iterate_children(iterated=iterated)
+                for subsub in sub.iterate_children(iterated=iterated):
+                    yield subsub
 
     def walk(self, walker, dst, overwrite=True):
         walker.walk(self.source_directory, dst, overwrite=overwrite)

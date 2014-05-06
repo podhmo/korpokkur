@@ -24,9 +24,9 @@ class TranslatorTests(unittest.TestCase):
             InputEnv
         )
         from korpokkur.input import CommandLineInput
-        from io import StringIO
-        input_port = StringIO("foo\n")
-        output_port = StringIO()
+        from ..compat import NativeIO
+        input_port = NativeIO("foo\n")
+        output_port = NativeIO()
 
         input = CommandLineInput(DummyScaffold(), input_port, output_port, "{word}?:")
         template = "myname is ${name}"
@@ -42,9 +42,9 @@ class TranslatorTests(unittest.TestCase):
             InputEnv
         )
         from korpokkur.input import CommandLineInput
-        from io import StringIO
-        input_port = StringIO("foo\n")
-        output_port = StringIO()
+        from ..compat import NativeIO
+        input_port = NativeIO("foo\n")
+        output_port = NativeIO()
 
         input = CommandLineInput(DummyScaffold(), input_port, output_port, "{word}?:")
         template = """\

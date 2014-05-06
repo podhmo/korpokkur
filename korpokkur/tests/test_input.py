@@ -11,9 +11,9 @@ class CommandLineInputReadTests(unittest.TestCase):
 
     def test_read_input_value_is_stored(self):
         from korpokkur.testing import DummyScaffold
-        from io import StringIO
-        input_port = StringIO("foo\n")
-        output_port = StringIO()
+        from ..compat import NativeIO
+        input_port = NativeIO("foo\n")
+        output_port = NativeIO()
         scaffold = DummyScaffold({})
 
         target = self._makeOne(scaffold, input_port, output_port)
@@ -26,9 +26,9 @@ class CommandLineInputReadTests(unittest.TestCase):
 
     def test_read__expected_word_found__gently_prompt(self):
         from korpokkur.testing import DummyScaffold
-        from io import StringIO
-        input_port = StringIO()
-        output_port = StringIO()
+        from ..compat import NativeIO
+        input_port = NativeIO()
+        output_port = NativeIO()
         scaffold = DummyScaffold({"package": ("package name", "sample")})
 
         target = self._makeOne(scaffold, input_port, output_port)
@@ -37,9 +37,9 @@ class CommandLineInputReadTests(unittest.TestCase):
 
     def test_read__expected_word_not_found__bluntly_prompt(self):
         from korpokkur.testing import DummyScaffold
-        from io import StringIO
-        input_port = StringIO()
-        output_port = StringIO()
+        from ..compat import NativeIO
+        input_port = NativeIO()
+        output_port = NativeIO()
         scaffold = DummyScaffold({"package": ("package name", "sample")})
 
         target = self._makeOne(scaffold, input_port, output_port)

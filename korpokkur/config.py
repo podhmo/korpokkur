@@ -94,9 +94,9 @@ class Configurator(object):
     def add_plugin(self, installname, plugin, iface=None, categoryname=None, strict=True):
         if iface is None:
             try:
-                iface = iter(implementedBy(plugin)).__next__()
+                iface = next(iter(implementedBy(plugin)))
                 if iface is IPlugin:
-                    iface = iter(implementedBy(plugin)).__next__() #xxx
+                    iface = next(iter(implementedBy(plugin))) #xxx
             except StopIteration:
                 raise Exception("plugin {} is not implemented by any interface".format(plugin))
 

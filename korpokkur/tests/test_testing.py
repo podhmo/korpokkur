@@ -29,6 +29,7 @@ class FileStructureFromDictTests(unittest.TestCase):
     def test_it(self):
         import os.path
         from korpokkur.testing import temporary_environment
+        from korpokkur.compat import text_
 
         with temporary_environment() as root:
             input_data = {"foo": {"setup.py": ":setup.py:",
@@ -47,7 +48,7 @@ class FileStructureFromDictTests(unittest.TestCase):
 
             def read_data(x):
                 with open(os.path.join(root, x)) as rf:
-                    return rf.read()
+                    return text_(rf.read())
 
             ## file content
             self.assertEqual(read_data("foo/setup.py"), ":setup.py:")
