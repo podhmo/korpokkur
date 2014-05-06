@@ -4,6 +4,7 @@ from zope.interface.registry import Components
 from zope.interface import implementer, implementedBy
 from zope.interface.verify import verifyClass
 from .interfaces import IConfigurator, IPlugin
+from .langhelper import import_symbol
 import pkg_resources
 import logging
 logger = logging.getLogger(__name__)
@@ -15,8 +16,6 @@ def get_registry():
         _registry = Components("mako_scaffold")
     return _registry
 
-def import_symbol(symbol): #todo cache
-    return pkg_resources.EntryPoint.parse("x=%s" % symbol).load(False)
 
 @implementer(IConfigurator)
 class Configurator(object):

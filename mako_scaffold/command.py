@@ -28,7 +28,7 @@ def get_app(setting=
 def listing(args):
     app = get_app()
     setup_logging(app, args)
-    cmd = app.activate_plugin("scaffoldgetter")
+    cmd = app.activate_plugin("scaffold:getter")
     for k, cls in cmd.all_scaffolds().items():
         out("{k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
 
@@ -36,28 +36,30 @@ def listing(args):
 def creation(args):
     app = get_app()
     setup_logging(app, args)
-    getter = app.activate_plugin("scaffoldgetter")
+    getter = app.activate_plugin("scaffold:getter")
     scaffold_cls = getter.get_scaffold(args.name)
-    scaffold = scaffold_cls()
+    scaffold = app.activate_plugin("scaffold:factory", scaffold_cls)
     input = setup_input(app, args, scaffold)
     emitter = app.activate_plugin("emitter.mako")
     reproduction = app.activate_plugin("reproduction.physical", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
-    walker.walk(scaffold.source_directory, args.destination)
+    scaffold.walk(walker, args.destination)
+
+
 
 def scanning(args):
     app = get_app()
     setup_logging(app, args)
-    getter = app.activate_plugin("scaffoldgetter")
+    getter = app.activate_plugin("scaffold:getter")
     scaffold_cls = getter.get_scaffold(args.name)
-    scaffold = scaffold_cls()
+    scaffold = app.activate_plugin("scaffold:factory", scaffold_cls)
     input = setup_input(app, args, scaffold)
     emitter = app.activate_plugin("emitter.mako")
     reproduction = app.activate_plugin("reproduction.simulation", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
-    walker.walk(scaffold.source_directory, args.destination)
+    scaffold.walk(walker, args.destination)
 
     ##xxxx
     import json

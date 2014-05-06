@@ -1,7 +1,12 @@
 # -*- coding:utf-8 -*-
 import pkg_resources
 from collections import OrderedDict
-from .interfaces import IScaffoldGetter, IPlugin
+from .config import import_symbol
+from .interfaces import (
+    IScaffold,
+    IScaffoldGetter,
+    IPlugin
+)
 from zope.interface import implementer
 import sys
 
@@ -13,8 +18,33 @@ def out(s):
     sys.stdout.write(s)
     sys.stdout.write("\n")
 
+## see: mako_scaffold.interfaces:IScaffold
+@implementer(IScaffold, IPlugin)
+class Scaffold(object):
+    @classmethod
+    def create_from_setting(cls, setting, template):
+        return cls(template)
+
+    def __init__(self, template):
+        self.template = template
+        self.source_directory = template.source_directory
+        self.expected_words = template.expected_words
+
+    def iterate_children(self):
+        #xxx:
+        for sym in  getattr(self.template, "__dro__", []):
+            yield self.__class__(import_symbol(sym)())
+
+    def walk(self, walker, dst):
+        walker.walk(self.source_directory, dst)
+        for sub_scaffold in self.iterate_children():
+            sub_scaffold.walk(walker, dst)
+
+
+
+## see: mako_scaffold.interfaces:IScaffoldGetter
 @implementer(IScaffoldGetter, IPlugin)
-class MakoScaffoldGetter(object):
+class ScaffoldGetter(object):
     @classmethod
     def create_from_setting(cls, setting):
         return cls(setting["entry_points_name"])
@@ -45,4 +75,5 @@ class MakoScaffoldGetter(object):
                 return scaffold_class
 
 def includeme(config):
-    config.add_plugin("scaffoldgetter", MakoScaffoldGetter)
+    config.add_plugin("scaffold:getter", ScaffoldGetter)
+    config.add_plugin("scaffold:factory", Scaffold)

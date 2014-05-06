@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 from zope.interface import (
-    Interface, 
+    Interface,
     Attribute
 )
 
@@ -8,12 +8,25 @@ class IScaffoldTemplate(Interface):
     __doc__ = Attribute("description text of scaffold")
     source_directory = Attribute("source directory for template")
     expected_words = Attribute("key and description list of rendering values")
+    __dro__ = Attribute("delegation resolution order") #optional
+
+class IScaffold(Interface):
+    source_directory = Attribute("source directory for template")
+    expected_words = Attribute("key and description list of rendering values")
+    def iterate_children():
+        pass
+
+    def walk(walker, dst):
+        pass
 
 class IConfigurator(Interface):
     def include(module_or_function):
         pass
 
-    def add_plugin(plugin, marker_iface):
+    def add_plugin(name, plugin, iface=None, categoryname=None):
+        pass
+
+    def activate_plugin(name, *args, **kwargs):
         pass
 
 class IPlugin(Interface):

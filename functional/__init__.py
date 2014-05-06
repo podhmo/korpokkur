@@ -18,10 +18,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 cleanup()
 main("_ create --logging DEBUG --config {here}/foo.ini simple-package {here}/build".format(here=here).split(" "))
 
-is_exists = lambda x : os.path.join(here,"build", x)
+is_exists = lambda x : os.path.exists(os.path.join(here, "build", x))
 
 assert (is_exists("foo"))
 assert (is_exists("foo/setup.py"))
+assert (is_exists("foo/.gitignore"))
 
 print("ok")
 

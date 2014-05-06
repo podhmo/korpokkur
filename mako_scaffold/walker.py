@@ -19,6 +19,13 @@ class StructualWalker(object):
         self.input = input
         self.detector = detector
         self.reproduction = reproduction
+        self.reached_path_set = set()
+
+    def is_reached(self, path):
+        if not path in self.reached_path_set:
+            self.reached_path_set.add(path)
+            return False
+        return True
 
     ## todo:move
     def convert_to_modified_path(self, root, r, name, dst, dirmap):
@@ -40,7 +47,8 @@ class StructualWalker(object):
     def on_dirname(self, root, r, d, dst, dirmap):
         name = self.get_modified_name(d)
         dirpath = self.convert_to_modified_path(root, r, name, dst, dirmap)
-        self.reproduction.prepare_for_copy_directory(dirpath)
+        if not self.is_reached(dirpath):
+            self.reproduction.prepare_for_copy_directory(dirpath)
         return dirpath
 
     def on_filename(self, root, r, f, dst, dirmap):
@@ -52,10 +60,12 @@ class StructualWalker(object):
         self.reproduction.prepare_for_copy_file(dst_path)
 
         if not self.detector.is_rewrite_file(f):
-            self.reproduction.copy_file(src_path, dst_path)
+            if not self.is_reached(dst_path):
+                self.reproduction.copy_file(src_path, dst_path)
         else:
             dst_path = self.detector.replace_rewrite_file(dst_path)
-            self.reproduction.modified_copy_file(src_path, dst_path)
+            if not self.is_reached(dst_path):
+                self.reproduction.modified_copy_file(src_path, dst_path)
         return dst_path
 
     def walk(self, root, dst):
@@ -79,7 +89,6 @@ class StructualWalker(object):
             for f in fs:
                 logger.debug("watch: f %s/%s", rel, f)
                 self.on_filename(root, r, f, dst, replaced_dirmap)
-
 
 def includeme(config):
     config.add_plugin("walker", StructualWalker)

@@ -22,5 +22,6 @@ setup(name='mako_scaffold',
       mako-scaffold = mako_scaffold.command:main
       [mako.scaffold]
       simple-package = mako_scaffold.scaffolds.simple_package:Package
+      py-gitignore
       """,
       )
