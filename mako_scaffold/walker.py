@@ -29,11 +29,11 @@ class StructualWalker(object):
 
     ## todo:move
     def convert_to_modified_path(self, root, r, name, dst, dirmap):
-        reldir = r.replace(root, dst)
-        path = os.path.join(reldir, name)
         if r in dirmap:
-            path = path.replace(r, dirmap[r])
-        return path
+            return os.path.join(dirmap[r], name)
+        else:
+            reldir = r.replace(root, dst)
+            return os.path.join(reldir, name)
 
     def get_modified_name(self, name):
         if not self.detector.is_rewrite_name(name):

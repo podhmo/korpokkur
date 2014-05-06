@@ -11,6 +11,8 @@ class Package(object):
     source_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), "+package+")
     ##varname -> description, default
     expected_words = {
-        "package": ("package name", "sample")
+        "package": ("package name", "sample"), 
+        "description": ("package description", "-"), 
+        "version": ("version number for project", "0.0")
     }
     __dro__ = ["mako_scaffold.scaffolds.pygitignore:Package"] #todo:validation
