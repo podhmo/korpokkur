@@ -130,7 +130,7 @@ class Configurator(object):
         try:
             plugin = self.registry.activated_plugin[categoryname]
         except KeyError:
-            raise AttributeError(categoryname)
+            raise AttributeError("forget to call self.activate_plugin('{name}.*')?".format(name=categoryname))
         setattr(self, categoryname, plugin) #cache
         return plugin
 
