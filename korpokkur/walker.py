@@ -3,11 +3,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 from zope.interface import implementer
-from mako_scaffold.interfaces import ITreeWalker, IPlugin
+from korpokkur.interfaces import ITreeWalker, IPlugin
 import os
 import os.path
 
-## see: mako_scaffold.interfaces:ITreeWalker
+## see: korpokkur.interfaces:ITreeWalker
 @implementer(ITreeWalker, IPlugin)
 class StructualWalker(object):
     @classmethod

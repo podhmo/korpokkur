@@ -18,7 +18,7 @@ def out(s):
     sys.stdout.write(s)
     sys.stdout.write("\n")
 
-## see: mako_scaffold.interfaces:IScaffold
+## see: korpokkur.interfaces:IScaffold
 @implementer(IScaffold, IPlugin)
 class Scaffold(object):
     @classmethod
@@ -55,14 +55,14 @@ class Scaffold(object):
 
 
 
-## see: mako_scaffold.interfaces:IScaffoldGetter
+## see: korpokkur.interfaces:IScaffoldGetter
 @implementer(IScaffoldGetter, IPlugin)
 class ScaffoldGetter(object):
     @classmethod
     def create_from_setting(cls, setting):
         return cls(setting["entry_points_name"])
 
-    def __init__(self, entry_points_name="mako.scaffold", out=err):
+    def __init__(self, entry_points_name="korpokkur.scaffold", out=err):
         self.entry_points_name = entry_points_name
         self.out = out
 

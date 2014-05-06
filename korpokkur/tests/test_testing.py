@@ -3,7 +3,7 @@ import unittest
 
 class TemporaryEnvironementTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
-        from mako_scaffold.testing import temporary_environment
+        from korpokkur.testing import temporary_environment
         return temporary_environment(*args, **kwargs)
 
     def test_it(self):
@@ -23,12 +23,12 @@ class TemporaryEnvironementTests(unittest.TestCase):
 
 class FileStructureFromDictTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
-        from mako_scaffold.testing import file_structure_from_dict
+        from korpokkur.testing import file_structure_from_dict
         return file_structure_from_dict(*args, **kwargs)
 
     def test_it(self):
         import os.path
-        from mako_scaffold.testing import temporary_environment
+        from korpokkur.testing import temporary_environment
 
         with temporary_environment() as root:
             input_data = {"foo": {"setup.py": ":setup.py:",
@@ -45,7 +45,10 @@ class FileStructureFromDictTests(unittest.TestCase):
             self.assertTrue(is_exists("foo/sample"))
             self.assertTrue(is_exists("foo/sample/foo.txt"))
 
-            read_data = lambda x : open(os.path.join(root, x)).read()
+            def read_data(x):
+                with open(os.path.join(root, x)) as rf:
+                    return rf.read()
+
             ## file content
             self.assertEqual(read_data("foo/setup.py"), ":setup.py:")
             self.assertEqual(read_data("foo/readme.txt"), u"日本語")

@@ -13,16 +13,16 @@ def out(s):
     sys.stdout.write("\n")
 
 def get_app(setting=
-            {"entry_points_name": "mako.scaffold", 
+            {"entry_points_name": "korpokkur.scaffold", 
              "input.prompt": "{word}? :"
                  }):
     config = Configurator(setting=setting)
-    config.include("mako_scaffold.scaffoldgetter")
-    config.include("mako_scaffold.walker")
-    config.include("mako_scaffold.detector")
-    config.include("mako_scaffold.input")
-    config.include("mako_scaffold.emitter")
-    config.include("mako_scaffold.reproduction")
+    config.include("korpokkur.scaffoldgetter")
+    config.include("korpokkur.walker")
+    config.include("korpokkur.detector")
+    config.include("korpokkur.input")
+    config.include("korpokkur.emitter")
+    config.include("korpokkur.reproduction")
     return config #xxx:
 
 

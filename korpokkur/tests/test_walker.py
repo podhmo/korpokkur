@@ -6,25 +6,25 @@ import os.path
 
 class FileTreeWalkerTests(unittest.TestCase):
     def _getTarget(self):
-        from mako_scaffold.walker import StructualWalker
+        from korpokkur.walker import StructualWalker
         return StructualWalker
 
     def _makeOne(self, input, reproduction):
-        from mako_scaffold.detector import SpecialObjectDetector
+        from korpokkur.detector import SpecialObjectDetector
         detector = SpecialObjectDetector()
         return self._getTarget()(
             input=input, detector=detector, reproduction=reproduction
         )
 
     def test_it(self):
-        from mako_scaffold import testing
+        from korpokkur import testing
         with testing.temporary_environment() as src_dir:
             dst_dir = "/my"
 
             structure_data = {"+package+": {"setup.py.tmpl": "${package}", "sample.txt": "yay"}}
             testing.file_structure_from_dict(src_dir, structure_data)
 
-            from mako_scaffold.input import DictInput
+            from korpokkur.input import DictInput
             input = DictInput(testing.DummyScaffold(), {"package": "foo"})
             reproduction = testing.DummyReproduction(src_dir)
             target = self._makeOne(input, reproduction)
@@ -41,15 +41,15 @@ class FileTreeWalkerTests(unittest.TestCase):
 
 
     def test_conflict__overwrite_is_false__then_exception_is_raised(self):
-        from mako_scaffold import testing
-        from mako_scaffold import FileConflict
+        from korpokkur import testing
+        from korpokkur import FileConflict
         with testing.temporary_environment() as src_dir:
             dst_dir = "/my"
 
             structure_data = {"+package+": {"setup.py.tmpl": "${package}", "sample.txt": "yay"}}
             testing.file_structure_from_dict(src_dir, structure_data)
 
-            from mako_scaffold.input import DictInput
+            from korpokkur.input import DictInput
             input = DictInput(testing.DummyScaffold(), {"package": "foo"})
             reproduction = testing.DummyReproduction(src_dir)
 
@@ -60,14 +60,14 @@ class FileTreeWalkerTests(unittest.TestCase):
                 target.walk(os.path.join(src_dir, "+package+"), dst_dir, overwrite=False)
 
     def test_conflict__overwrite_is_true__ok(self):
-        from mako_scaffold import testing
+        from korpokkur import testing
         with testing.temporary_environment() as src_dir:
             dst_dir = "/my"
 
             structure_data = {"+package+": {"setup.py.tmpl": "${package}", "sample.txt": "yay"}}
             testing.file_structure_from_dict(src_dir, structure_data)
 
-            from mako_scaffold.input import DictInput
+            from korpokkur.input import DictInput
             input = DictInput(testing.DummyScaffold(), {"package": "foo"})
             reproduction = testing.DummyReproduction(src_dir)
 

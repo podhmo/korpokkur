@@ -21,7 +21,7 @@ class Boo(object):
 
 class ConfigurationPluginRegistrationIntegrationTests(unittest.TestCase):
     def _getTarget(self):
-        from mako_scaffold.config import Configurator
+        from korpokkur.config import Configurator
         return Configurator
 
     def _makeOne(self):
@@ -52,7 +52,7 @@ class ConfigurationPluginRegistrationIntegrationTests(unittest.TestCase):
 
 class ConfigrationPluginMaybeDottedTests(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
-        from mako_scaffold.config import Configurator
+        from korpokkur.config import Configurator
         from zope.interface.registry import Components
         return Configurator({}, registry=Components("test"))
 
@@ -61,29 +61,29 @@ class ConfigrationPluginMaybeDottedTests(unittest.TestCase):
         return config.maybe_dotted(*args, **kwargs)
 
     def test_object(self):
-        from mako_scaffold.interfaces import IPlugin
+        from korpokkur.interfaces import IPlugin
         result = self._callFUT(IPlugin)
         self.assertEqual(result, IPlugin)
 
     def test_string__return_object(self):
-        from mako_scaffold.interfaces import IPlugin
-        result = self._callFUT("mako_scaffold.interfaces:IPlugin")
+        from korpokkur.interfaces import IPlugin
+        result = self._callFUT("korpokkur.interfaces:IPlugin")
         self.assertEqual(result, IPlugin)
 
     def test_string_relative__return_object(self):
-        from mako_scaffold.interfaces import IPlugin
+        from korpokkur.interfaces import IPlugin
         result = self._callFUT("..interfaces:IPlugin")
         self.assertEqual(result, IPlugin)
 
     def test_string_relative__return_object2(self):
-        from mako_scaffold.interfaces import IPlugin
+        from korpokkur.interfaces import IPlugin
         def closure():
             result = self._callFUT("..interfaces:IPlugin")
             self.assertEqual(result, IPlugin)
         closure()
 
     def test_string_relative__return_object3(self):
-        from mako_scaffold.interfaces import IPlugin
+        from korpokkur.interfaces import IPlugin
         target = self._makeOne()
         def closure():
             result = target.maybe_dotted("..interfaces:IPlugin")
@@ -91,10 +91,10 @@ class ConfigrationPluginMaybeDottedTests(unittest.TestCase):
         closure()
 
     def test_string_relative__return_object4(self):
-        from mako_scaffold.interfaces import IPlugin
+        from korpokkur.interfaces import IPlugin
         target = self._makeOne()
         def closure():
-            from mako_scaffold.tests import call
+            from korpokkur.tests import call
             result = call(target, "maybe_dotted", "..interfaces:IPlugin")
             self.assertEqual(result, IPlugin)
         closure()
@@ -102,7 +102,7 @@ class ConfigrationPluginMaybeDottedTests(unittest.TestCase):
 
 class ConfiguratorAddPluginTests(unittest.TestCase):
     def _getTarget(self):
-        from mako_scaffold.config import Configurator
+        from korpokkur.config import Configurator
         return Configurator
 
     def _makeOne(self):

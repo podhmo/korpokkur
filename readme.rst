@@ -1,9 +1,9 @@
-mako_scaffold
+korpokkur
 ========================================
 
-mako-scaffold
+korpokkur
 
-mako-scaffold has several subcommands. list below.
+korpokkur has several subcommands. list below.
 
 - list
 - create
@@ -16,7 +16,7 @@ list
 
 .. code:: python
 
-    $ mako-scaffold list
+    $ korpokkur list
     simple-package -- tiny python package scaffold (this is sample)
 
 create
@@ -24,7 +24,7 @@ create
 
 .. code:: python
 
-    $ mako-scaffold create simple-package .
+    $ korpokkur create simple-package .
     package? :foo
     ## foo package is generated
 
@@ -33,7 +33,7 @@ so, enable to pass value by config file.
 
 .. code:: python
 
-    $ mako-scaffold create --config ./foo.ini simple-package .
+    $ korpokkur create --config ./foo.ini simple-package .
 
 .. code:: foo.ini
 
@@ -44,7 +44,7 @@ or json file is also ok.
 
 .. code:: python
 
-    $ mako-scaffold create --config ./foo.json simple-package .
+    $ korpokkur create --config ./foo.json simple-package .
 
 .. code:: foo.ini
 
@@ -58,10 +58,10 @@ scan is dry-run operation about create.
 
 .. code:: python
 
-    $ mako-scaffold scan simple-package .
+    $ korpokkur scan simple-package .
     package? :foo
     d[c]:/tmp/foo
-    f[m]: /~/mako_scaffold/scaffolds/simple_package/+package+/setup.py.tmpl -> /tmp/foo/setup.py
+    f[m]: /~/korpokkur/scaffolds/simple_package/+package+/setup.py.tmpl -> /tmp/foo/setup.py
     ----------------------------------------
     {
       "package": "foo"

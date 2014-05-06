@@ -4,7 +4,7 @@ requires = [
     "zope.interface"
     ]
 
-setup(name='mako_scaffold',
+setup(name='korpokkur',
       version='0.0.1',
       description='scaffold',
       long_description="", 
@@ -16,12 +16,11 @@ setup(name='mako_scaffold',
       package_dir={'': '.'},
       packages=find_packages('.'),
       install_requires = requires,
-      test_suite="mako_scaffold.tests", 
+      test_suite="korpokkur.tests", 
       entry_points = """
       [console_scripts]
-      mako-scaffold = mako_scaffold.command:main
-      [mako.scaffold]
-      simple-package = mako_scaffold.scaffolds.simple_package:Package
-      py-gitignore
+      korpokkur = korpokkur.command:main
+      [korpokkur.scaffold]
+      simple-package = korpokkur.scaffolds.simple_package:Package
       """,
       )

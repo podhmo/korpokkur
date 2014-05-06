@@ -3,9 +3,9 @@ import logging
 logger = logging.getLogger(__name__)
 import sys
 from zope.interface import implementer
-from mako_scaffold.interfaces import IInput
+from korpokkur.interfaces import IInput
 
-## see: mako_scaffold.interfaces:IInput
+## see: korpokkur.interfaces:IInput
 @implementer(IInput)
 class DictInput(object):
     @classmethod
@@ -41,7 +41,7 @@ class DictInput(object):
     def __contains__(self, k):
         return k in self.cache
 
-## see: mako_scaffold.interfaces:IInput
+## see: korpokkur.interfaces:IInput
 @implementer(IInput)
 class CommandLineInput(object):
     prompt = "{varname} ({description})[{default}]:"

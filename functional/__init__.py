@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import os.path
 import sys
-from mako_scaffold.command import main
+from korpokkur.command import main
 
 def err(s):
     sys.stderr.write(s)

@@ -3,7 +3,7 @@ import unittest
 
 class ScaffoldIterateTests(unittest.TestCase):
     def _getTarget(self):
-        from mako_scaffold.scaffoldgetter import Scaffold
+        from korpokkur.scaffoldgetter import Scaffold
         return Scaffold
 
     def _makeOne(self, *args, **kwargs):

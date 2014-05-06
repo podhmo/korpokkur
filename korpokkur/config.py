@@ -13,7 +13,7 @@ _registry = None
 def get_registry():
     global _registry
     if _registry is None:
-        _registry = Components("mako_scaffold")
+        _registry = Components("korpokkur")
     return _registry
 
 

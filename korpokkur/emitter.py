@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 from zope.interface import implementer
-from mako_scaffold.interfaces import IEmitter
+from korpokkur.interfaces import IEmitter
 from mako.template import Template as MakoTemplate
 from mako import runtime as mako_runtime
 from mako.util import FastEncodingBuffer
@@ -78,7 +78,7 @@ def _render(template, callable_, args, data, as_unicode=False):
     return context._pop_buffer().getvalue()
 
 
-## see: mako_scaffold.interfaces:IEmitter
+## see: korpokkur.interfaces:IEmitter
 @implementer(IEmitter)
 class MakoEmitter(object):
     @classmethod

@@ -7,7 +7,7 @@ from zope.interface import implementer
 from .interfaces import IReproduction
 from . import FileConflict
 
-## see: mako_scaffold.interfaces:IReproduction
+## see: korpokkur.interfaces:IReproduction
 @implementer(IReproduction)
 class PhysicalReproduction(object):
     @classmethod
@@ -47,7 +47,7 @@ def err(s):
     sys.stderr.write(s)
     sys.stderr.write("\n")
 
-## see: mako_scaffold.interfaces:IReproduction
+## see: korpokkur.interfaces:IReproduction
 @implementer(IReproduction)
 class SimulateReproduction(object):
     @classmethod

@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
 from zope.interface import implementer
-from mako_scaffold.interfaces import ISpecialObjectDetector, IPlugin
+from korpokkur.interfaces import ISpecialObjectDetector, IPlugin
 import re
 
 ## tentative implementation. interface is not fixed.
 
-## see: mako_scaffold.interfaces:ISpecialObjectDetector
+## see: korpokkur.interfaces:ISpecialObjectDetector
 @implementer(ISpecialObjectDetector, IPlugin)
 class SpecialObjectDetector(object):
     @classmethod

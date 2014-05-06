@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 
 from zope.interface import implementer
-from mako_scaffold.interfaces import IScaffoldTemplate
+from korpokkur.interfaces import IScaffoldTemplate
 import os.path
 
-## see: mako_scaffold.interfaces:IScaffoldTemplate
+## see: korpokkur.interfaces:IScaffoldTemplate
 @implementer(IScaffoldTemplate)
 class Package(object):
     """tiny python package scaffold (this is sample)"""
