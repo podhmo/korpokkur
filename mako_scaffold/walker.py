@@ -7,7 +7,6 @@ from mako_scaffold.interfaces import ITreeWalker, IPlugin
 import os
 import os.path
 
-
 ## see: mako_scaffold.interfaces:ITreeWalker
 @implementer(ITreeWalker, IPlugin)
 class StructualWalker(object):
@@ -51,24 +50,24 @@ class StructualWalker(object):
             self.reproduction.prepare_for_copy_directory(dirpath)
         return dirpath
 
-    def on_filename(self, root, r, f, dst, dirmap):
+    def on_filename(self, root, r, f, dst, dirmap, overwrite):
         name = self.get_modified_name(f)
 
         src_path = os.path.join(r, f)
         dst_path = self.convert_to_modified_path(root, r, name, dst, dirmap)
 
-        self.reproduction.prepare_for_copy_file(dst_path)
-
         if not self.detector.is_rewrite_file(f):
             if not self.is_reached(dst_path):
+                self.reproduction.prepare_for_copy_file(dst_path, overwrite)
                 self.reproduction.copy_file(src_path, dst_path)
         else:
             dst_path = self.detector.replace_rewrite_file(dst_path)
             if not self.is_reached(dst_path):
+                self.reproduction.prepare_for_copy_file(dst_path, overwrite)
                 self.reproduction.modified_copy_file(src_path, dst_path)
         return dst_path
 
-    def walk(self, root, dst):
+    def walk(self, root, dst, overwrite=True):
         dst = os.path.abspath(dst)
         replaced_dirmap = {}
         prefix = self.on_dirname(
@@ -88,7 +87,7 @@ class StructualWalker(object):
                 replaced_dirmap[os.path.join(r, d)] = replaced_dirname
             for f in fs:
                 logger.debug("watch: f %s/%s", rel, f)
-                self.on_filename(root, r, f, dst, replaced_dirmap)
+                self.on_filename(root, r, f, dst, replaced_dirmap, overwrite=overwrite)
 
 def includeme(config):
     config.add_plugin("walker", StructualWalker)

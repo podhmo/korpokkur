@@ -5,6 +5,7 @@ logger = logging.getLogger(__name__)
 import tempfile
 import contextlib
 import shutil
+from .reproduction import FileConflict
 
 @contextlib.contextmanager
 def temporary_environment(cleanup=True):
@@ -52,7 +53,15 @@ class DummyReproduction(object):
     def _simplify(self, path):
         return path.replace(self.src_root, ":S:")
 
-    def prepare_for_copy_file(self, dst_path):
+    def is_copy_file_ng(self, dst_path, overwrite):
+        if overwrite:
+            return False
+        k = self._simplify(dst_path)
+        return k in [f[1] for f in self.files] or k in [f[1] for f in self.modified_files]
+
+    def prepare_for_copy_file(self, dst_path, overwrite):
+        if self.is_copy_file_ng(dst_path, overwrite):
+            raise FileConflict(dst_path)
         self.makedirs.append(self._simplify(os.path.dirname(dst_path)))
 
     def prepare_for_copy_directory(self, dir_path):

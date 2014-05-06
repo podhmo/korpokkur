@@ -73,7 +73,7 @@ class IEmitter(Interface):
         pass
 
 class IReproduction(Interface):
-    def prepare_for_copy_file(dst_path):
+    def prepare_for_copy_file(dst_path, overwrite):
         pass
 
     def prepare_for_copy_directory(dir_path):

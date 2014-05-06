@@ -5,7 +5,7 @@ import os.path
 import shutil
 from zope.interface import implementer
 from .interfaces import IReproduction
-
+from . import FileConflict
 
 ## see: mako_scaffold.interfaces:IReproduction
 @implementer(IReproduction)
@@ -18,8 +18,13 @@ class PhysicalReproduction(object):
         self.emitter = emitter
         self.input = input
 
-    def prepare_for_copy_file(self, dst_path):
+    def is_copy_file_ng(self, dst_path, overwrite):
+        return not overwrite and os.path.exists(dst_path)
+
+    def prepare_for_copy_file(self, dst_path, overwrite):
         dir_path = os.path.dirname(dst_path)
+        if self.is_copy_file_ng(dst_path, overwrite):
+            raise FileConflict(dst_path)
         return self.prepare_for_copy_directory(dir_path)
 
     def prepare_for_copy_directory(self, dir_path):
@@ -27,11 +32,9 @@ class PhysicalReproduction(object):
             os.makedirs(dir_path)
 
     def copy_file(self, src_path, dst_path):
-        self.prepare_for_copy_file(dst_path)
         shutil.copy(src_path, dst_path)
 
     def modified_copy_file(self, src_path, dst_path):
-        self.prepare_for_copy_file(dst_path)
         with open(dst_path, "w") as wf:
             with open(src_path) as rf:
                 template = rf.read()
@@ -56,8 +59,13 @@ class SimulateReproduction(object):
         self.input = input
         self.output = set()
 
-    def prepare_for_copy_file(self, dst_path):
+    def is_copy_file_ng(self, dst_path, overwrite):
+        return not overwrite and os.path.exists(dst_path)
+
+    def prepare_for_copy_file(self, dst_path, overwrite):
         dir_path = os.path.dirname(dst_path)
+        if self.is_copy_file_ng(dst_path, overwrite):
+            raise FileConflict(dst_path)
         return self.prepare_for_copy_directory(dir_path)
 
     def prepare_for_copy_directory(self, dir_path):

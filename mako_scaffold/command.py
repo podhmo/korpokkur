@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import argparse
-from mako_scaffold.config import Configurator
+from .config import Configurator
+from . import FileConflict
 import sys
 
 def err(s):
@@ -33,6 +34,13 @@ def listing(args):
         out("{k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
 
 
+def output_loadmap(input):
+    ##xxxx
+    import json
+    out("----------------------------------------")
+    out("*input values*")
+    out(json.dumps(input.loaded_map, indent=2, ensure_ascii=False))
+
 def creation(args):
     app = get_app()
     setup_logging(app, args)
@@ -44,9 +52,12 @@ def creation(args):
     reproduction = app.activate_plugin("reproduction.physical", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
-    scaffold.walk(walker, args.destination)
-
-
+    try:
+        scaffold.walk(walker, args.destination, overwrite=not args.nooverwrite)
+    except FileConflict as e:
+        err("conflict file: {e.path} is already existed".format(e=e))
+        output_loadmap(input)
+        sys.exit(-1)
 
 def scanning(args):
     app = get_app()
@@ -59,12 +70,16 @@ def scanning(args):
     reproduction = app.activate_plugin("reproduction.simulation", emitter, input)
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
-    scaffold.walk(walker, args.destination)
+    try:
+        scaffold.walk(walker, args.destination, overwrite=not args.nooverwrite)
+    except FileConflict as e:
+        err("conflict file: {e.path} is already existed".format(e=e))
+        output_loadmap(input)
+        sys.exit(-1)
+    output_loadmap(input)
+    sys.exit(0)
 
-    ##xxxx
-    import json
-    out("----------------------------------------")
-    out(json.dumps(input.loaded_map, indent=2, ensure_ascii=False))
+
 
 
 def setup_input(app, args, scaffold):
@@ -106,6 +121,7 @@ def main(sys_args=sys.argv):
     create_parser = sub_parsers.add_parser("create")
     create_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     create_parser.add_argument("-c", "--config")
+    create_parser.add_argument("--nooverwrite", action="store_true", default=False)
     create_parser.add_argument("name")
     create_parser.add_argument("destination", default=".", nargs="?")
     create_parser.set_defaults(func=creation)
@@ -113,6 +129,7 @@ def main(sys_args=sys.argv):
     scan_parser = sub_parsers.add_parser("scan")
     scan_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     scan_parser.add_argument("-c", "--config")
+    scan_parser.add_argument("--nooverwrite", action="store_true", default=False)
     scan_parser.add_argument("name")
     scan_parser.add_argument("destination", default=".", nargs="?")
     scan_parser.set_defaults(func=scanning)
