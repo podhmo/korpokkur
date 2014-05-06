@@ -34,9 +34,13 @@ D = {"foo": {"setup.py": "testest",
                 wf.write(D)
 
 ## dummy object
-
 class DummyScaffold(object):
-    pass
+    default_expected_words = {
+        "_varname" : ("_description", "_default")
+    }
+    def __init__(self, words=None):
+        self.expected_words = words or self.default_expected_words
+        self.source_directory = "."
 
 class DummyReproduction(object):
     def __init__(self, src_root):

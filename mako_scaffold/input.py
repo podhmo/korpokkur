@@ -38,16 +38,18 @@ class DictInput(object):
     def __iter__(self):
         return iter(self.cache)
 
+    def __contains__(self, k):
+        return k in self.cache
 
 ## see: mako_scaffold.interfaces:IInput
 @implementer(IInput)
 class CommandLineInput(object):
-    prompt = "{word}?:"
+    prompt = "{varname} ({description})[{default}]:"
     @classmethod
     def create_from_setting(cls, settings, scaffold):
-        return cls(sys.stdin, sys.stdout, prompt=settings["input.prompt"]) ##TODO: get prompt via scaffold
+        return cls(scaffold, sys.stdin, sys.stdout, prompt=settings["input.prompt"]) ##TODO: get prompt via scaffold
 
-    def __init__(self, scaffold, input_port, output_port, prompt):
+    def __init__(self, scaffold, input_port, output_port, prompt="{word}?:"):
         self.scaffold = scaffold
         self.input_port = input_port
         self.output_port = output_port
@@ -69,11 +71,22 @@ class CommandLineInput(object):
         except KeyError:
             return default
 
-    def read(self, word):
-        self.output_port.write(self.prompt.format(word=word))
+    def ask_message(self, word):
+        try:
+            description, default = self.scaffold.expected_words[word]
+            self.output_port.write(self.__class__.prompt.format(varname=word, description=description, default=default))
+        except KeyError:
+            self.output_port.write(self.prompt.format(word=word))
+            default = ""
         self.output_port.flush()
+        return default
 
+    def read(self, word):
+        default = self.ask_message(word)
         value = self.input_port.readline().rstrip()
+        if value == "" and default is not None:
+            value = default
+
         self.cache[word] = value
         self.loaded_map[word] = value
         return value
@@ -91,6 +104,9 @@ class CommandLineInput(object):
 
     def __iter__(self):
         return iter(self.cache)
+
+    def __contains__(self, k):
+        return k in self.cache
 
 
 
