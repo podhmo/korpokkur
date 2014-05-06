@@ -21,7 +21,7 @@ def get_app(setting=
     config.include("korpokkur.walker")
     config.include("korpokkur.detector")
     config.include("korpokkur.input")
-    config.include("korpokkur.emitter")
+    config.include("korpokkur.emitter.mako")
     config.include("korpokkur.reproduction")
     return config #xxx:
 

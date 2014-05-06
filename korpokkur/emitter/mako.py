@@ -5,39 +5,13 @@ from mako.template import Template as MakoTemplate
 from mako import runtime as mako_runtime
 from mako.util import FastEncodingBuffer
 from mako import compat
-from collections import Mapping
+from . import InputEnv
 
-class InputEnv(Mapping):
-    def __init__(self, input, undefined=mako_runtime.UNDEFINED):
-        self.input = input
-        self.undefined = undefined
-
-    def __getitem__(self, k):
-        return self.input.load(k)
-
-    def __setitem__(self, k, v):
-        return self.input.save(k, v)
-
-    def __delitem__(self, k):
-        raise Exception("not support")
-
-    def get(self, k, default=None):
-        return self.input.load_with_default(k, default=default)
-
-    def copy(self):
-        return self.input.copy()
-
-    def __iter__(self):
-        return iter(self.input)
-
-    def __len__(self):
-        return len(self.input.cache) #xxx:
-
-class InputEnvTemplate(MakoTemplate):
+class MakoInputEnvTemplate(MakoTemplate):
     def render_by_env(self, env):
         return _render(self, self.callable_, (), env)
 
-class InputEnvContext(mako_runtime.Context):
+class MakoInputEnvContext(mako_runtime.Context):
     def __init__(self, buffer, data):
         self._buffer_stack = [buffer]
 
@@ -69,7 +43,7 @@ def _render(template, callable_, args, data, as_unicode=False):
                         as_unicode=as_unicode,
                         encoding=template.output_encoding,
                         errors=template.encoding_errors)
-    context = InputEnvContext(buf, data)
+    context = MakoInputEnvContext(buf, data)
     context._outputting_as_unicode = as_unicode
     context._set_with_template(template)
 
@@ -91,7 +65,7 @@ class MakoEmitter(object):
 
     def emit(self, template, input):
         env = self.env_factory(input)
-        return InputEnvTemplate(template).render_by_env(env)
+        return MakoInputEnvTemplate(template).render_by_env(env)
 
 def includeme(config):
     config.add_plugin("emitter.mako", MakoEmitter, categoryname="emitter")
