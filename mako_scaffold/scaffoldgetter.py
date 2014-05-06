@@ -25,15 +25,28 @@ class Scaffold(object):
     def create_from_setting(cls, setting, template):
         return cls(template)
 
-    def __init__(self, template):
+    def __init__(self, template, lookup=import_symbol):
         self.template = template
-        self.source_directory = template.source_directory
-        self.expected_words = template.expected_words
+        self.lookup = lookup
 
-    def iterate_children(self):
-        #xxx:
+    @property
+    def source_directory(self):
+        return self.template.source_directory
+
+    @property
+    def expected_words(self):
+        return self.template.expected_words
+
+    def iterate_children(self, iterated=None):
+        iterated = iterated or set()
+        iterated.add(self.template)
         for sym in  getattr(self.template, "__dro__", []):
-            yield self.__class__(import_symbol(sym)())
+            template = self.lookup(sym)
+            if not template in iterated:
+                iterated.add(self.template)
+                sub = self.__class__(template, lookup=self.lookup)
+                yield sub
+                yield from sub.iterate_children(iterated=iterated)
 
     def walk(self, walker, dst):
         walker.walk(self.source_directory, dst)
