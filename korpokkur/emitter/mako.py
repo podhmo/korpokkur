@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from __future__ import absolute_import #for py2.x
 from zope.interface import implementer
 from korpokkur.interfaces import IEmitter
 from mako.template import Template as MakoTemplate
