@@ -10,7 +10,8 @@ testing_extras = [
 
 setup(name='korpokkur',
       version='0.0.3',
-      description='scaffold',
+      url="https://github.com/podhmo/korpokkur", 
+      description='scaffolding',
       long_description="", 
       author='podhmo',
       classifiers=[
