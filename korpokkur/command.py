@@ -36,8 +36,8 @@ def listing(args):
 def output_loadmap(input):
     ##xxxx
     import json
-    out("----------------------------------------")
-    out("*input values*")
+    err("----------------------------------------")
+    err("*input values*")
     out(json.dumps(input.loaded_map, indent=2, ensure_ascii=False))
 
 def creation(args):
