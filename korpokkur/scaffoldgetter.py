@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import pkg_resources
+import re
 from collections import OrderedDict
 from .config import import_symbol
 from .interfaces import (
@@ -19,15 +20,12 @@ def out(s):
     sys.stdout.write("\n")
 
 ## see: korpokkur.interfaces:IScaffold
-@implementer(IScaffold, IPlugin)
+@implementer(IScaffold)
 class Scaffold(object):
-    @classmethod
-    def create_from_setting(cls, setting, template):
-        return cls(template)
-
-    def __init__(self, template, lookup=import_symbol):
+    def __init__(self, template, lookup=import_symbol, extension=None):
         self.template = template
         self.lookup = lookup
+        self.extension = extension
 
     @property
     def source_directory(self):
@@ -52,22 +50,30 @@ class Scaffold(object):
     def walk(self, walker, dst, overwrite=True):
         if hasattr(self.template, "cache"):
             walker.input.update(self.template.cache)
+
+        ## todo: reserved word "extension"
+        if self.extension is not None: #xxx:
+            walker.input.update(extension=self.extension)
+
         walker.walk(self.source_directory, dst, overwrite=overwrite)
         for sub_scaffold in self.iterate_children():
             sub_scaffold.walk(walker, dst, overwrite=overwrite)
 
 
-
 ## see: korpokkur.interfaces:IScaffoldGetter
 @implementer(IScaffoldGetter, IPlugin)
 class ScaffoldGetter(object):
-    @classmethod
-    def create_from_setting(cls, setting):
-        return cls(setting["entry_points_name"])
+    scaffold_name_rx = re.compile(r"(\S+)\s*\[\s*(\S+)\s*\]")
+    _import_symbol = staticmethod(import_symbol)
 
-    def __init__(self, entry_points_name="korpokkur.scaffold", out=err):
+    @classmethod
+    def create_from_setting(cls, setting, factory=Scaffold):
+        return cls(setting["entry_points_name"], factory=factory)
+
+    def __init__(self, entry_points_name="korpokkur.scaffold", out=err, factory=Scaffold):
         self.entry_points_name = entry_points_name
         self.out = out
+        self.factory = factory
 
     def iterate_scaffolds(self):
         eps = list(pkg_resources.iter_entry_points(self.entry_points_name))
@@ -85,11 +91,20 @@ class ScaffoldGetter(object):
             scaffolds[name] = scaffold_class
         return scaffolds
 
+    def split_scaffold_name(self, name):
+        m = self.scaffold_name_rx.search(name)
+        if m:
+            return m.group(1), m.group(2)
+        else:
+            return name, None
+
     def get_scaffold(self, expected_name):
-        for name, scaffold_class in self.iterate_scaffolds():
+        expected_name, extension = self.split_scaffold_name(expected_name)
+        for name, template_class in self.iterate_scaffolds():
             if name == expected_name:
-                return scaffold_class
+                return self.factory(template_class, 
+                                    lookup=self._import_symbol,
+                                    extension=extension)
 
 def includeme(config):
-    config.add_plugin("scaffold:getter", ScaffoldGetter)
-    config.add_plugin("scaffold:factory", Scaffold)
+    config.add_plugin("scaffoldgetter", ScaffoldGetter)

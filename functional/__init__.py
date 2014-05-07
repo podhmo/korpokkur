@@ -16,7 +16,7 @@ def cleanup():
 
 here = os.path.abspath(os.path.dirname(__file__))
 cleanup()
-main("_ create --logging DEBUG --config {here}/foo.ini simple-package {here}/build".format(here=here).split(" "))
+main("_ create --logging DEBUG --config {here}/foo.ini package {here}/build".format(here=here).split(" "))
 
 is_exists = lambda x : os.path.exists(os.path.join(here, "build", x))
 

@@ -28,7 +28,7 @@ def get_app(setting=
 def listing(args):
     app = get_app()
     setup_logging(app, args)
-    cmd = app.activate_plugin("scaffold:getter")
+    cmd = app.activate_plugin("scaffoldgetter")
     for k, cls in cmd.all_scaffolds().items():
         out("{k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
 
@@ -43,9 +43,8 @@ def output_loadmap(input):
 def creation(args):
     app = get_app()
     setup_logging(app, args)
-    getter = app.activate_plugin("scaffold:getter")
-    scaffold_cls = getter.get_scaffold(args.name)
-    scaffold = app.activate_plugin("scaffold:factory", scaffold_cls)
+    getter = app.activate_plugin("scaffoldgetter")
+    scaffold = getter.get_scaffold(args.name)
     input = setup_input(app, args, scaffold)
     emitter = setup_emitter(app, args, scaffold)
     reproduction = app.activate_plugin("reproduction.physical", emitter, input)
@@ -61,9 +60,8 @@ def creation(args):
 def scanning(args):
     app = get_app()
     setup_logging(app, args)
-    getter = app.activate_plugin("scaffold:getter")
-    scaffold_cls = getter.get_scaffold(args.name)
-    scaffold = app.activate_plugin("scaffold:factory", scaffold_cls)
+    getter = app.activate_plugin("scaffoldgetter")
+    scaffold = getter.get_scaffold(args.name)
     input = setup_input(app, args, scaffold)
     emitter = setup_emitter(app, args, scaffold)
     reproduction = app.activate_plugin("reproduction.simulation", emitter, input)
