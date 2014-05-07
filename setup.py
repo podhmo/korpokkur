@@ -21,7 +21,7 @@ setup(name='korpokkur',
       [console_scripts]
       korpokkur = korpokkur.command:main
       [korpokkur.scaffold]
-      simple-package = korpokkur.scaffolds.simple_package:Package
+      package = korpokkur.scaffolds.package:Package
       scaffold = korpokkur.scaffolds.scaffold:Template
       """,
       )
