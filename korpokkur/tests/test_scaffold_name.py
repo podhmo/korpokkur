@@ -9,9 +9,14 @@ class ScaffoldSplitNameTests(unittest.TestCase):
     def test_with_normal_name(self):
         name = "scaffold"
         result = self._callFUT(name)
-        self.assertEqual(result, ("scaffold", None))
+        self.assertEqual(result, ("scaffold", set()))
 
     def test_with_extension_name(self):
         name = "scaffold[pytest]"
         result = self._callFUT(name)
-        self.assertEqual(result, ("scaffold", "pytest"))
+        self.assertEqual(result, ("scaffold", set(["pytest"])))
+
+    def test_with_extension_name2(self):
+        name = "scaffold[pytest mock fixture]"
+        result = self._callFUT(name)
+        self.assertEqual(result, ("scaffold", set(["pytest", "mock", "fixture"])))

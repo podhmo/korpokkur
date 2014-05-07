@@ -26,10 +26,10 @@ def out(s):
 ## see: korpokkur.interfaces:IScaffold
 @implementer(IScaffold)
 class Scaffold(object):
-    def __init__(self, template, lookup=import_symbol, extension=None):
+    def __init__(self, template, lookup=import_symbol, extensions=None):
         self.template = template
         self.lookup = lookup
-        self.extension = extension
+        self.extensions = extensions
 
     @property
     def source_directory(self):
@@ -55,9 +55,9 @@ class Scaffold(object):
         if hasattr(self.template, "cache"):
             walker.input.update(self.template.cache)
 
-        ## todo: reserved word "extension"
-        if self.extension is not None: #xxx:
-            walker.input.update({":extension:": self.extension})
+        ## todo: reserved word "extensions"
+        if self.extensions is not None: #xxx:
+            walker.input.update({":extensions:": self.extensions})
 
         walker.walk(self.source_directory, dst, overwrite=overwrite)
         for sub_scaffold in self.iterate_children():
@@ -67,7 +67,7 @@ class Scaffold(object):
 ## see: korpokkur.interfaces:IScaffoldGetter
 @implementer(IScaffoldGetter, IPlugin)
 class ScaffoldGetter(object):
-    scaffold_name_rx = re.compile(r"(\S+)\s*\[\s*(\S+)\s*\]")
+    scaffold_name_rx = re.compile(r"(\S+)\s*\[(.+)\]")
     _import_symbol = staticmethod(import_symbol)
 
     @classmethod
@@ -98,21 +98,21 @@ class ScaffoldGetter(object):
     def split_scaffold_name(self, name):
         m = self.scaffold_name_rx.search(name)
         if m:
-            return m.group(1), m.group(2)
+            return m.group(1), set(e for e in m.group(2).split(" ") if not e == "")
         else:
-            return name, None
+            return name, set()
 
     def get_scaffold(self, expected_name):
-        expected_name, extension = self.split_scaffold_name(expected_name)
+        expected_name, extensions = self.split_scaffold_name(expected_name)
         for name, template_class in self.iterate_scaffolds():
             if name == expected_name:
-                if (extension
-                    and hasattr(template_class, "support_extensions") 
-                    and extension not in template_class.support_extensions):
-                    raise NotSupportExtension(extension)
+                if (extensions and hasattr(template_class, "support_extensions")):
+                    extensions = extensions.intersection(template_class.support_extensions)
+                    if not extensions:
+                        raise NotSupportExtension(expected_name)
                 return self.factory(template_class, 
                                     lookup=self._import_symbol,
-                                    extension=extension)
+                                    extensions=extensions)
         raise ScaffoldNotFound(expected_name)
 
 def includeme(config):

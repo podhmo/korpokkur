@@ -21,7 +21,7 @@ install_requires=[
 docs_extras = [
     ]
 
-%if context.get(":extension:") == "pytest":
+%if "pytest" in context.get(":extensions:"):
 tests_require =[
     "pytest"
 ]
@@ -42,7 +42,7 @@ class PyTest(TestCommand):
 <%self:setup>
       cmdclass = {'test': PyTest},
 </%self:setup>
-%elif context.get(":extension:") == "nose":
+%elif "nose" in context.get(":extensions:"):
 tests_require = [
     "nose"
     ]
