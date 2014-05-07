@@ -18,15 +18,52 @@ install_requires=[
     'setuptools',
     ]
 
+docs_extras = [
+    ]
+
+%if context.get(":extension:") == "pytest":
+tests_require =[
+    "pytest"
+]
+testing_extras = tests_require + [
+    ]
+
+from setuptools.command.test import test as TestCommand
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+    def run_tests(self):
+        import pytest
+        pytest.main(self.test_args)
+
+<%self:setup>
+      cmdclass = {'test': PyTest},
+</%self:setup>
+%elif context.get(":extension:") == "nose":
+tests_require = [
+    "nose"
+    ]
+
+testing_extras = tests_require + [
+    ]
+<%self:setup>
+    test_suite='nose.collector',
+</%self:setup>
+%else:
 tests_require = [
     ]
 
 testing_extras = tests_require + [
     ]
+<%self:setup>
+      test_suite="${package}.tests",
+</%self:setup>
+%endif
 
-docs_extras = [
-    ]
-
+<%def name="setup()">
 setup(name='${package}',
       version='${version}',
       description='${description}',
@@ -47,8 +84,9 @@ setup(name='${package}',
           'testing':testing_extras,
           'docs':docs_extras,
           },
-      tests_require = tests_require,
-      test_suite="${package}.tests",
+      tests_require = tests_require,\
+${caller.body()}\
       entry_points = """\
       """
       )
+</%def>
