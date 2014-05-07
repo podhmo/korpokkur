@@ -9,7 +9,7 @@ testing_extras = [
 ]
 
 setup(name='korpokkur',
-      version='0.0.2',
+      version='0.0.3',
       description='scaffold',
       long_description="", 
       author='podhmo',
@@ -17,8 +17,7 @@ setup(name='korpokkur',
           'Programming Language :: Python',
           'Programming Language :: Python :: 3'
       ],
-      package_dir={'': '.'},
-      packages=find_packages('.'),
+      packages=find_packages(),
       install_requires = requires,
       extras_require = {
           'testing':testing_extras,
