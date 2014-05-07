@@ -4,3 +4,11 @@ class FileConflict(Exception):
         self.path = path
         super(FileConflict, self).__init__(*args, **kwargs)
 
+
+class ScaffoldException(Exception):
+    pass
+
+class NotSupportExtension(ScaffoldException):
+    pass
+class ScaffoldNotFound(ScaffoldException):
+    pass

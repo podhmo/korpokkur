@@ -2,6 +2,10 @@
 import pkg_resources
 import re
 from collections import OrderedDict
+from . import (
+    NotSupportExtension, 
+    ScaffoldNotFound
+)
 from .config import import_symbol
 from .interfaces import (
     IScaffold,
@@ -53,7 +57,7 @@ class Scaffold(object):
 
         ## todo: reserved word "extension"
         if self.extension is not None: #xxx:
-            walker.input.update(extension=self.extension)
+            walker.input.update({":extension:": self.extension})
 
         walker.walk(self.source_directory, dst, overwrite=overwrite)
         for sub_scaffold in self.iterate_children():
@@ -102,9 +106,14 @@ class ScaffoldGetter(object):
         expected_name, extension = self.split_scaffold_name(expected_name)
         for name, template_class in self.iterate_scaffolds():
             if name == expected_name:
+                if (extension
+                    and hasattr(template_class, "support_extensions") 
+                    and extension not in template_class.support_extensions):
+                    raise NotSupportExtension(extension)
                 return self.factory(template_class, 
                                     lookup=self._import_symbol,
                                     extension=extension)
+        raise ScaffoldNotFound(expected_name)
 
 def includeme(config):
     config.add_plugin("scaffoldgetter", ScaffoldGetter)

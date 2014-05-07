@@ -7,7 +7,7 @@ import os.path
 ## see: korpokkur.interfaces:IScaffoldTemplate
 @implementer(IScaffoldTemplate)
 class Package(object):
-    """tiny python package scaffold (this is sample)"""
+    """sample python package scaffold extensions=[unittest, nose, pytest]"""
     source_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), "+package+")
     ##varname -> description, default
     expected_words = {
@@ -17,3 +17,4 @@ class Package(object):
     }
     __dro__ = ["korpokkur.scaffolds.pygitignore:Package"] #todo:validation
     template_engine = "mako"
+    support_extensions = ["unittest", "nose", "pytest"] #default is unittest
