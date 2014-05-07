@@ -6,7 +6,7 @@ from . import (
     NotSupportExtension, 
     ScaffoldNotFound
 )
-from .config import import_symbol
+from .langhelper import import_symbol
 from .interfaces import (
     IScaffold,
     IScaffoldGetter,

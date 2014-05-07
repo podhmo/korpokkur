@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 requires = [
     "mako", 
-    "zope.interface", 
+    "configless", 
     ]
 
 testing_extras = [
