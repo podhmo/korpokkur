@@ -9,7 +9,7 @@ testing_extras = [
 ]
 
 setup(name='korpokkur',
-      version='0.0.3',
+      version='0.0.4',
       url="https://github.com/podhmo/korpokkur", 
       description='scaffolding',
       long_description="", 
