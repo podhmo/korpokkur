@@ -35,6 +35,7 @@ class PhysicalReproduction(object):
         shutil.copy(src_path, dst_path)
 
     def modified_copy_file(self, src_path, dst_path):
+        self.input.update({":src:":src_path, ":dst:":dst_path})
         with open(dst_path, "w") as wf:
             with open(src_path) as rf:
                 template = rf.read()
@@ -79,6 +80,7 @@ class SimulateReproduction(object):
 
     def modified_copy_file(self, src_path, dst_path):
         err("f[m]: {} -> {}".format(src_path, dst_path))
+        self.input.update({":src:":src_path, ":dst:":dst_path})
         with open(src_path) as rf:
             template = rf.read()
             (self.emitter.emit(template, self.input))

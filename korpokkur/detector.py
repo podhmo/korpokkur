@@ -13,7 +13,7 @@ class SpecialObjectDetector(object):
         return cls()
 
     def is_rewrite_name(self, dirname):
-        return dirname.startswith("+") and dirname.endswith("+")
+        return self.file_rx.search(dirname) is not None
 
     def is_rewrite_file(self, filename):
         return filename.endswith(".tmpl")

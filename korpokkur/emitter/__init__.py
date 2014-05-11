@@ -19,6 +19,9 @@ class InputEnv(Mapping):
     def get(self, k, default=None):
         return self.input.load_with_default(k, default=default)
 
+    def update(self, D):
+        return self.input.update(D)
+
     def copy(self):
         return self.input.copy()
 
