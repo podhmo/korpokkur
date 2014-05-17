@@ -36,6 +36,9 @@ class IPlugin(Interface):
     def create_from_setting(setting): #classmethod
         pass
 
+class IComputeValue(Interface):
+    def __call__(input, k):
+        pass
 
 ###
 class IInput(Interface):

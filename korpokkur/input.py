@@ -2,8 +2,30 @@
 import logging
 logger = logging.getLogger(__name__)
 import sys
-from zope.interface import implementer
-from korpokkur.interfaces import IInput
+from zope.interface import (
+    implementer, 
+    provider
+)
+from korpokkur.interfaces import (
+    IInput, 
+    IComputeValue
+)
+
+def cached_call(cache, k, fn):
+    def callee(*args, **kwargs):
+        v = fn(*args, **kwargs)
+        cache[k] = v
+        return v
+    return callee
+
+def is_compute_value(v):
+    try:
+        return callable(v) and IComputeValue.providedBy(v)
+    except IndexError:
+        return False
+
+def compute_value(fn):
+    return provider(IComputeValue)(fn)
 
 ## see: korpokkur.interfaces:IInput
 @implementer(IInput)
@@ -18,13 +40,19 @@ class DictInput(object):
         self.loaded_map = D
 
     def load_with_default(self, k, default=None):
-        return self.cache.get(k, default)
+        try:
+            return self.read(k)
+        except KeyError:
+            return default
 
     def load(self, k, reload=False):
-        return self.cache[k]
+        return self.read(k)
 
     def read(self, k):
-        return self.cache[k]
+        v = self.cache[k]
+        if is_compute_value(v):
+            v = cached_call(self.cache, k, v)(self, k)
+        return v
 
     def save(self, k, v):
         self.cache[k] = v
@@ -61,7 +89,10 @@ class CommandLineInput(object):
         if reload:
             return self.read(word)
         try:
-            return self.cache[word]
+            v = self.cache[word]
+            if is_compute_value(v):
+                v = cached_call(self.cache, word, v)(self, word)
+            return v
         except KeyError:
             return self.read(word)
 
