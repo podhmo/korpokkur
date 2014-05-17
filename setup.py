@@ -31,5 +31,6 @@ setup(name='korpokkur',
       [korpokkur.scaffold]
       package = korpokkur.scaffolds.package:Package
       scaffold = korpokkur.scaffolds.scaffold:Template
+      nestedscaffold = korpokkur.scaffolds.nestedscaffold:Template
       """,
       )
