@@ -1,6 +1,6 @@
 2014-05-17  podhmo  <podhmo@beproud.jp>	
-    * version 0.0.6
-    * will be able to namespace tag in scaffold template (mako)
+	* version 0.0.6
+	* will be able to namespace tag in scaffold template (mako)
 
 2014-05-17  podhmo  <podhmo@beproud.jp>	
 	* version 0.0.5

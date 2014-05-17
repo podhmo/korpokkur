@@ -9,8 +9,9 @@ class IScaffoldTemplate(Interface):
     source_directory = Attribute("source directory for template")
     expected_words = Attribute("key and description list of rendering values")
     template_engine = Attribute("template engine") 
-    __dro__ = Attribute("delegation resolution order") #optional
+    __dro__ = Attribute("delegation resolution order list") #optional
     support_extensions = Attribute("scaffold extension name list") #optional
+    marker_comments = Attribute("marker comments dict") #optional
 
 class IScaffold(Interface):
     source_directory = Attribute("source directory for template")
@@ -40,6 +41,10 @@ class IComputeValue(Interface):
     def __call__(input, k):
         pass
 
+class IAfterEmitFilter(Interface):
+    def __call__(input, output_string):
+        pass
+
 ###
 class IInput(Interface):
     def load(word, reload=False):
@@ -49,6 +54,7 @@ class IInput(Interface):
         """ read data"""
 
     loaded_map = Attribute("loaded pair store")
+    scaffold = Attribute("IScaffold")
 
 class ISpecialObjectDetector(Interface):
     def is_rewrite_name(dirname):

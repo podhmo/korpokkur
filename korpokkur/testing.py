@@ -43,9 +43,11 @@ class DummyScaffold(object):
     default_expected_words = {
         "_varname" : ("_description", "_default")
     }
-    def __init__(self, words=None):
+    def __init__(self, words=None, marker_comments=None):
         self.expected_words = words or self.default_expected_words
         self.source_directory = "."
+        if marker_comments:
+            self.marker_comments = marker_comments
 
 class DummyReproduction(object):
     def __init__(self, src_root):
