@@ -79,8 +79,9 @@ class ScaffoldGetter(object):
         self.out = out
         self.factory = factory
 
-    def iterate_scaffolds(self):
-        eps = list(pkg_resources.iter_entry_points(self.entry_points_name))
+    def iterate_scaffolds(self, entry_points_name=None):
+        entry_points_name = entry_points_name or self.entry_points_name
+        eps = list(pkg_resources.iter_entry_points(entry_points_name))
         for entry in eps:
             try:
                 scaffold_class = entry.load()
@@ -89,9 +90,10 @@ class ScaffoldGetter(object):
                 self.out('Warning: could not load entry point %s (%s: %s)' % (
                     entry.name, e.__class__.__name__, e))
 
-    def all_scaffolds(self):
+    def all_scaffolds(self, entry_points_name=None):
+        entry_points_name = entry_points_name or self.entry_points_name
         scaffolds = OrderedDict()
-        for name, scaffold_class in self.iterate_scaffolds():
+        for name, scaffold_class in self.iterate_scaffolds(entry_points_name=entry_points_name):
             scaffolds[name] = scaffold_class
         return scaffolds
 

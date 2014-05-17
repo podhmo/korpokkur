@@ -8,7 +8,7 @@ import os.path
 ## see: korpokkur.interfaces:IScaffoldTemplate
 @implementer(IScaffoldTemplate)
 class Package(object):
-    """nested python package scaffold(e.g. foo.boo) extensions=[unittest, nose, pytest]"""
+    """nested python package scaffold(e.g. foo.boo) extensions=[nose, pytest]"""
     source_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), "+package+")
     ##varname -> description, default
     expected_words = {

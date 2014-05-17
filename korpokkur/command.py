@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import argparse
 from .config import Configurator
+from functools import partial
 from . import FileConflict
 import sys
 
@@ -12,10 +13,16 @@ def out(s):
     sys.stdout.write(s)
     sys.stdout.write("\n")
 
-def get_app(setting=
-            {"entry_points_name": "korpokkur.scaffold", 
-             "input.prompt": "{word}? :"
-                 }):
+default_setting = {
+    "walker.skiptop": False, 
+    "entry_points_name": "korpokkur.scaffold", 
+    "input.prompt": "{word}? :"
+}
+
+def get_app(**kwargs):
+    setting = {}
+    setting.update(default_setting)
+    setting.update(kwargs)
     config = Configurator(setting=setting)
     config.include("korpokkur.scaffoldgetter")
     config.include("korpokkur.walker")
@@ -25,12 +32,17 @@ def get_app(setting=
     return config #xxx:
 
 
-def listing(args):
-    app = get_app()
+def listing(args, kwargs={}):
+    app = get_app(**kwargs)
     setup_logging(app, args)
     cmd = app.activate_plugin("scaffoldgetter")
+    out("create:")
     for k, cls in cmd.all_scaffolds().items():
-        out("{k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
+        out("  {k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
+
+    out("add:")
+    for k, cls in cmd.all_scaffolds(entry_points_name="korpokkur.partial.scaffold").items():
+        out("  {k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
 
 
 def output_loadmap(input):
@@ -40,8 +52,8 @@ def output_loadmap(input):
     err("*input values*")
     out(json.dumps(input.loaded_map, indent=2, ensure_ascii=False))
 
-def addition(args):
-    app = get_app()
+def creation(args, kwargs={}):
+    app = get_app(**kwargs)
     setup_logging(app, args)
     getter = app.activate_plugin("scaffoldgetter")
     scaffold = getter.get_scaffold(args.name)
@@ -51,31 +63,15 @@ def addition(args):
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
     try:
-        scaffold.walk(walker, args.destination, overwrite=not args.nooverwrite, skiptop=True)
+        skiptop = app.setting["walker.skiptop"]
+        scaffold.walk(walker, args.destination, overwrite=not args.nooverwrite, skiptop=skiptop)
     except FileConflict as e:
         err("conflict file: {e.path} is already existed".format(e=e))
         output_loadmap(input)
         sys.exit(-1)
 
-def creation(args):
-    app = get_app()
-    setup_logging(app, args)
-    getter = app.activate_plugin("scaffoldgetter")
-    scaffold = getter.get_scaffold(args.name)
-    input = setup_input(app, args, scaffold)
-    emitter = setup_emitter(app, args, scaffold)
-    reproduction = app.activate_plugin("reproduction.physical", emitter, input)
-    detector = app.activate_plugin("detector")
-    walker = app.activate_plugin("walker", input, detector, reproduction)
-    try:
-        scaffold.walk(walker, args.destination, overwrite=not args.nooverwrite, skiptop=False)
-    except FileConflict as e:
-        err("conflict file: {e.path} is already existed".format(e=e))
-        output_loadmap(input)
-        sys.exit(-1)
-
-def scanning(args):
-    app = get_app()
+def scanning(args, kwargs={}):
+    app = get_app(**kwargs)
     setup_logging(app, args)
     getter = app.activate_plugin("scaffoldgetter")
     scaffold = getter.get_scaffold(args.name)
@@ -151,15 +147,31 @@ def main(sys_args=sys.argv):
     add_parser.add_argument("--nooverwrite", action="store_true", default=False)
     add_parser.add_argument("name")
     add_parser.add_argument("destination", default=".", nargs="?")
-    add_parser.set_defaults(func=addition)
+    add_parser_setting = {
+        "entry_points_name": "korpokkur.partial.scaffold", 
+        "walker.skiptop": True
+    }
+    add_parser.set_defaults(func=partial(creation, kwargs=add_parser_setting))
 
-    scan_parser = sub_parsers.add_parser("scan")
-    scan_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
-    scan_parser.add_argument("-c", "--config")
-    scan_parser.add_argument("--nooverwrite", action="store_true", default=False)
-    scan_parser.add_argument("name")
-    scan_parser.add_argument("destination", default=".", nargs="?")
-    scan_parser.set_defaults(func=scanning)
+    create_scan_parser = sub_parsers.add_parser("scan")
+    create_scan_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
+    create_scan_parser.add_argument("-c", "--config")
+    create_scan_parser.add_argument("--nooverwrite", action="store_true", default=False)
+    create_scan_parser.add_argument("name")
+    create_scan_parser.add_argument("destination", default=".", nargs="?")
+    create_scan_parser.set_defaults(func=scanning)
+
+    add_scan_parser = sub_parsers.add_parser("addscan")
+    add_scan_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
+    add_scan_parser.add_argument("-c", "--config")
+    add_scan_parser.add_argument("--nooverwrite", action="store_true", default=False)
+    add_scan_parser.add_argument("name")
+    add_scan_parser.add_argument("destination", default=".", nargs="?")
+    add_parser_setting = {
+        "entry_points_name": "korpokkur.partial.scaffold", 
+        "walker.skiptop": True
+    }
+    add_scan_parser.set_defaults(func=partial(scanning, kwargs=add_parser_setting))
 
     args = parser.parse_args(sys_args)
     try:
