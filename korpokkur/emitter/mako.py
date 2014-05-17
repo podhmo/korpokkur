@@ -2,13 +2,78 @@
 from __future__ import absolute_import #for py2.x
 from zope.interface import implementer
 from korpokkur.interfaces import IEmitter
+import posixpath
+import re
 import os.path
 from mako.template import Template as MakoTemplate
 from mako.lookup import TemplateLookup
+from mako import exceptions as mako_exceptions
 from mako import runtime as mako_runtime
 from mako.util import FastEncodingBuffer
 from mako import compat
+
 from . import InputEnv
+
+class MakoInputEnvLookup(TemplateLookup):
+    FISRT_IS_SLASH_RX = re.compile(r'^\/+')
+    def get_template(self, uri):
+        try:
+            if self.filesystem_checks:
+                return self._check(uri, self._collection[uri])
+            else:
+                return self._collection[uri]
+        except KeyError:
+            ## WHAT IS THIS!!!!!!!!
+            is_abs_uri = os.path.isabs(uri)
+            u = self.FISRT_IS_SLASH_RX.sub('', uri)
+            for dir in self.directories:
+                if is_abs_uri:
+                    srcfile = uri
+                else:
+                    srcfile = posixpath.normpath(posixpath.join(dir, u))
+                if os.path.isfile(srcfile):
+                    return self._load(srcfile, uri)
+            else:
+                raise mako_exceptions.TopLevelLookupException(
+                                    "Cant locate template for uri %r" % uri)
+
+    def _load(self, filename, uri):
+        self._mutex.acquire()
+        try:
+            try:
+                # try returning from collection one
+                # more time in case concurrent thread already loaded
+                return self._collection[uri]
+            except KeyError:
+                pass
+            try:
+                if self.modulename_callable is not None:
+                    module_filename = self.modulename_callable(filename, uri)
+                else:
+                    module_filename = None
+                self._collection[uri] = template = MakoInputEnvTemplate(
+                                        uri=uri,
+                                        filename=posixpath.normpath(filename),
+                                        lookup=self,
+                                        module_filename=module_filename,
+                                        **self.template_args)
+                return template
+            except:
+                # if compilation fails etc, ensure
+                # template is removed from collection,
+                # re-raise
+                self._collection.pop(uri, None)
+                raise
+        finally:
+            self._mutex.release()
+
+    def put_string(self, uri, text):
+        self._collection[uri] = MakoInputEnvTemplate(
+                                    text,
+                                    lookup=self,
+                                    uri=uri,
+                                    **self.template_args)
+
 
 class MakoInputEnvTemplate(MakoTemplate):
     def render_by_env(self, env):
@@ -71,7 +136,7 @@ class MakoEmitter(object):
         try:
             return self.lookup_cache[dirpath]
         except KeyError:
-            lookup = self.lookup_cache[dirpath] = TemplateLookup(directories=[dirpath])
+            lookup = self.lookup_cache[dirpath] = MakoInputEnvLookup(directories=[dirpath])
             return lookup
 
     def emit(self, input, text=None, filename=None):

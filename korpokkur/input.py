@@ -58,7 +58,7 @@ class DictInput(object):
         self.cache[k] = v
 
     def copy(self):
-        self.__class__(self.scaffold, self.cache.copy())
+        return self.__class__(self.scaffold, self.cache.copy())
 
     def update(self, d):
         self.cache.update(d)

@@ -47,6 +47,18 @@ class MakoEmitterTests(unittest.TestCase):
         result = target.emit(input, filename=filename)
         self.assertEqual(result.rstrip(), "hello foo")
 
+    def test_input_dict__lookup_template_filename__with_namespace(self):
+        from korpokkur.emitter.mako import (
+            MakoEmitter, 
+            InputEnv
+        )
+
+        input = self._makeDictInput({"name": "foo"})
+        filename = os.path.join(self.HERE, "hello_with_helpers.mako")
+
+        target = MakoEmitter(InputEnv)
+        result = target.emit(input, filename=filename)
+        self.assertEqual(result.strip(), "foo,foo")
 
     def test_input_commandline(self):
         from korpokkur.emitter.mako import (

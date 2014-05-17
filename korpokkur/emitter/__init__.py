@@ -19,11 +19,17 @@ class InputEnv(Mapping):
     def get(self, k, default=None):
         return self.input.load_with_default(k, default=default)
 
+    def pop(self, k, default=None):
+        try:
+            return self.input.cache.pop(k)
+        except KeyError:
+            return default
+
     def update(self, D):
         return self.input.update(D)
 
     def copy(self):
-        return self.input.copy()
+        return self.__class__(self.input.copy())
 
     def __iter__(self):
         return iter(self.input)
