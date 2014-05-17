@@ -37,9 +37,7 @@ class PhysicalReproduction(object):
     def modified_copy_file(self, src_path, dst_path):
         self.input.update({":src:":src_path, ":dst:":dst_path})
         with open(dst_path, "w") as wf:
-            with open(src_path) as rf:
-                template = rf.read() #xxx
-                wf.write(self.emitter.emit(input=self.input, filename=src_path, text=template, ))
+            wf.write(self.emitter.emit(input=self.input, filename=src_path))
 
 
 import sys
@@ -82,8 +80,7 @@ class SimulateReproduction(object):
         err("f[m]: {} -> {}".format(src_path, dst_path))
         self.input.update({":src:":src_path, ":dst:":dst_path})
         with open(src_path) as rf:
-            template = rf.read() #xxx:
-            (self.emitter.emit(self.input, filename=src_path, text=template))
+            (self.emitter.emit(self.input, filename=src_path))
 
 
 def includeme(config):
