@@ -1,0 +1,93 @@
+# -*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
+
+import os
+import sys
+
+from setuptools import setup, find_packages
+here = os.path.abspath(os.path.dirname(__file__))
+try:
+    with open(os.path.join(here, 'README.rst')) as f:
+        README = f.read()
+    with open(os.path.join(here, 'CHANGES.txt')) as f:
+        CHANGES = f.read()
+except IOError:
+    README = CHANGES = ''
+
+install_requires=[
+    'setuptools',
+    ]
+
+docs_extras = [
+    ]
+
+%if "pytest" in context.get(":extensions:"):
+tests_require =[
+    "pytest"
+]
+testing_extras = tests_require + [
+    ]
+
+from setuptools.command.test import test as TestCommand
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+    def run_tests(self):
+        import pytest
+        pytest.main(self.test_args)
+
+<%self:setup>
+      cmdclass = {'test': PyTest},
+</%self:setup>
+%elif "nose" in context.get(":extensions:"):
+tests_require = [
+    "nose"
+    ]
+
+testing_extras = tests_require + [
+    ]
+<%self:setup>
+    test_suite='nose.collector',
+</%self:setup>
+%else:
+tests_require = [
+    ]
+
+testing_extras = tests_require + [
+    ]
+<%self:setup>
+      test_suite="${package}.tests",
+</%self:setup>
+%endif
+
+<%def name="setup()">
+setup(name='${package}',
+      version='${version}',
+      description='${description}',
+      long_description=README + '\n\n' +  CHANGES,
+      classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: Implementation :: CPython",
+        ],
+      keywords='',
+      author="",
+      author_email="",
+      url="",
+      namespace_packages=["${package_prefix}"],
+      packages=find_packages(),
+      include_package_data=True,
+      zip_safe=False,
+      install_requires = install_requires,
+      extras_require = {
+          'testing':testing_extras,
+          'docs':docs_extras,
+          },
+      tests_require = tests_require,\
+${caller.body()}\
+      entry_points = """\
+      """
+      )
+</%def>
