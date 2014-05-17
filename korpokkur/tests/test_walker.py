@@ -2,6 +2,52 @@
 import unittest
 import os.path
 
+class GetPrefixTests(unittest.TestCase):
+    def _getTarget(self):
+        from korpokkur.walker import StructualWalker
+        return StructualWalker
+
+    def _makeOne(self, input, reproduction):
+        from korpokkur.detector import SpecialObjectDetector
+        detector = SpecialObjectDetector()
+        return self._getTarget()(
+            input=input, detector=detector, reproduction=reproduction
+        )
+
+    def test_for_create__skiptop_is_False__include_toplevel_dirname(self):
+        from korpokkur import testing
+        from korpokkur.input import DictInput
+
+        ## /my/scaffolds/+package+/sample.txt -> /tmp/foo/sample.txt
+        root = "/my/scaffolds/+package+"
+        package = "foo"
+        dst = "/tmp"
+        skiptop = False
+
+        input = DictInput(testing.DummyScaffold(), {"package": package})
+        reproduction = testing.DummyReproduction(root)
+        target = self._makeOne(input, reproduction)
+
+        result = target.get_prefix(root, dst, {}, skiptop=skiptop)
+        self.assertEqual(result, "/tmp/foo")
+
+    def test_for_add__skiptop_is_True__without_toplevel_dirname(self):
+        from korpokkur import testing
+        from korpokkur.input import DictInput
+
+        ## /my/scaffolds/+package+/sample.txt -> /tmp/sample.txt
+        root = "/my/scaffolds/+package+"
+        package = "foo"
+        dst = "/tmp"
+        skiptop = True
+
+        input = DictInput(testing.DummyScaffold(), {"package": package})
+        reproduction = testing.DummyReproduction(root)
+        target = self._makeOne(input, reproduction)
+
+        result = target.get_prefix(root, dst, {}, skiptop=skiptop)
+        self.assertEqual(result, "/tmp")
+
 
 
 class FileTreeWalkerTests(unittest.TestCase):

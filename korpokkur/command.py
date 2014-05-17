@@ -40,6 +40,23 @@ def output_loadmap(input):
     err("*input values*")
     out(json.dumps(input.loaded_map, indent=2, ensure_ascii=False))
 
+def addition(args):
+    app = get_app()
+    setup_logging(app, args)
+    getter = app.activate_plugin("scaffoldgetter")
+    scaffold = getter.get_scaffold(args.name)
+    input = setup_input(app, args, scaffold)
+    emitter = setup_emitter(app, args, scaffold)
+    reproduction = app.activate_plugin("reproduction.physical", emitter, input)
+    detector = app.activate_plugin("detector")
+    walker = app.activate_plugin("walker", input, detector, reproduction)
+    try:
+        scaffold.walk(walker, args.destination, overwrite=not args.nooverwrite, skiptop=True)
+    except FileConflict as e:
+        err("conflict file: {e.path} is already existed".format(e=e))
+        output_loadmap(input)
+        sys.exit(-1)
+
 def creation(args):
     app = get_app()
     setup_logging(app, args)
@@ -51,7 +68,7 @@ def creation(args):
     detector = app.activate_plugin("detector")
     walker = app.activate_plugin("walker", input, detector, reproduction)
     try:
-        scaffold.walk(walker, args.destination, overwrite=not args.nooverwrite)
+        scaffold.walk(walker, args.destination, overwrite=not args.nooverwrite, skiptop=False)
     except FileConflict as e:
         err("conflict file: {e.path} is already existed".format(e=e))
         output_loadmap(input)
@@ -127,6 +144,14 @@ def main(sys_args=sys.argv):
     create_parser.add_argument("name")
     create_parser.add_argument("destination", default=".", nargs="?")
     create_parser.set_defaults(func=creation)
+
+    add_parser = sub_parsers.add_parser("add")
+    add_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
+    add_parser.add_argument("-c", "--config")
+    add_parser.add_argument("--nooverwrite", action="store_true", default=False)
+    add_parser.add_argument("name")
+    add_parser.add_argument("destination", default=".", nargs="?")
+    add_parser.set_defaults(func=addition)
 
     scan_parser = sub_parsers.add_parser("scan")
     scan_parser.add_argument("--logging", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])

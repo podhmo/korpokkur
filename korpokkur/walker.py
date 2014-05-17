@@ -67,9 +67,7 @@ class StructualWalker(object):
                 self.reproduction.modified_copy_file(src_path, dst_path)
         return dst_path
 
-    def walk(self, root, dst, overwrite=True):
-        dst = os.path.abspath(dst)
-        replaced_dirmap = {}
+    def get_prefix(self, root, dst, replaced_dirmap, skiptop=False):
         prefix = self.on_dirname(
             os.path.dirname(root), 
             os.path.dirname(root), 
@@ -77,6 +75,14 @@ class StructualWalker(object):
             dst, 
             replaced_dirmap
         )
+        if skiptop:
+            prefix = "/".join(prefix.split("/")[:-1])
+        return prefix
+
+    def walk(self, root, dst, overwrite=True, skiptop=False):
+        dst = os.path.abspath(dst)
+        replaced_dirmap = {}
+        prefix = self.get_prefix(root, dst, replaced_dirmap, skiptop=skiptop)
 
         dst = os.path.join(dst, prefix)
         for r, ds, fs in os.walk(root):

@@ -51,7 +51,7 @@ class Scaffold(object):
                 for subsub in sub.iterate_children(iterated=iterated):
                     yield subsub
 
-    def walk(self, walker, dst, overwrite=True):
+    def walk(self, walker, dst, overwrite=True, skiptop=False):
         if hasattr(self.template, "cache"):
             walker.input.update(self.template.cache)
 
@@ -59,7 +59,7 @@ class Scaffold(object):
         if self.extensions is not None: #xxx:
             walker.input.update({":extensions:": self.extensions})
 
-        walker.walk(self.source_directory, dst, overwrite=overwrite)
+        walker.walk(self.source_directory, dst, overwrite=overwrite, skiptop=skiptop)
         for sub_scaffold in self.iterate_children():
             sub_scaffold.walk(walker, dst, overwrite=overwrite)
 

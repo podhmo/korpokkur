@@ -19,7 +19,7 @@ class IScaffold(Interface):
     def iterate_children():
         pass
 
-    def walk(walker, dst):
+    def walk(walker, dst, overwrite=True, skiptop=False):
         pass
 
 class IConfigurator(Interface):
