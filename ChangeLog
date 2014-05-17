@@ -1,12 +1,18 @@
 2014-05-17  podhmo  <podhmo@beproud.jp>	
+    * version 0.0.6
+    * will be able to namespace tag in scaffold template (mako)
+
+2014-05-17  podhmo  <podhmo@beproud.jp>	
 	* version 0.0.5
 	* add scaffold command "nestedpackage"
 	* add scaffold command "nestedscaffold"
 	* add compute_value function for input plugin
+
 2014-05-7  podhmo  <podhmo@beproud.jp>	
 	* version 0.0.4
 	* add extensioin function for scaffold plugin
 	* support choosing test function on "package" scaffold (e.g. package[pytest], package[nose])
+
 2014-04-19  podhmo  <podhmo@beproud.jp>
 	* version 0.0.0
 	* initial commit
