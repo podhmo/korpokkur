@@ -2,6 +2,18 @@
 import unittest
 
 class MakoEmitterTests(unittest.TestCase):
+    def _makeCommandLineInput(self, input_string):
+        from korpokkur.testing import DummyScaffold
+        from korpokkur.input import CommandLineInput
+        from ..compat import NativeIO
+        input_port = NativeIO(input_string)
+        output_port = NativeIO()
+        error_port = NativeIO()
+
+        return CommandLineInput(DummyScaffold(),
+                                 input_port, output_port, error_port, 
+                                 prompt="{word}?:")
+
     def test_it(self):
         from korpokkur.testing import DummyScaffold
         from korpokkur.emitter.mako import (
@@ -18,20 +30,12 @@ class MakoEmitterTests(unittest.TestCase):
         self.assertEqual(result, "myname is foo")
 
     def test_input_commandline(self):
-        from korpokkur.testing import DummyScaffold
         from korpokkur.emitter.mako import (
-            MakoEmitter, 
+            MakoEmitter,
             InputEnv
         )
-        from korpokkur.input import CommandLineInput
-        from ..compat import NativeIO
-        input_port = NativeIO("foo\n")
-        output_port = NativeIO()
-        error_port = NativeIO()
 
-        input = CommandLineInput(DummyScaffold(),
-                                 input_port, output_port, error_port, 
-                                 prompt="{word}?:")
+        input = self._makeCommandLineInput(input_string="foo\n")
         template = "myname is ${name}"
 
         target = MakoEmitter(InputEnv)
@@ -39,21 +43,12 @@ class MakoEmitterTests(unittest.TestCase):
         self.assertEqual(result, "myname is foo")
 
     def test_input_commandline__with_deftemplate(self):
-        from korpokkur.testing import DummyScaffold
         from korpokkur.emitter.mako import (
-            MakoEmitter, 
+            MakoEmitter,
             InputEnv
         )
-        from korpokkur.input import CommandLineInput
-        from ..compat import NativeIO
-        input_port = NativeIO("foo\n")
-        output_port = NativeIO()
-        error_port = NativeIO()
 
-        input = CommandLineInput(DummyScaffold(),
-                                 input_port, output_port, error_port, 
-                                 prompt="{word}?:")
-
+        input = self._makeCommandLineInput(input_string="foo\n")
         template = """\
 <%def name="greeting(name)">
 myname is ${name}
