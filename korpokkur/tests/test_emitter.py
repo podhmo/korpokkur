@@ -27,8 +27,11 @@ class MakoEmitterTests(unittest.TestCase):
         from ..compat import NativeIO
         input_port = NativeIO("foo\n")
         output_port = NativeIO()
+        error_port = NativeIO()
 
-        input = CommandLineInput(DummyScaffold(), input_port, output_port, "{word}?:")
+        input = CommandLineInput(DummyScaffold(),
+                                 input_port, output_port, error_port, 
+                                 prompt="{word}?:")
         template = "myname is ${name}"
 
         target = MakoEmitter(InputEnv)
@@ -45,8 +48,12 @@ class MakoEmitterTests(unittest.TestCase):
         from ..compat import NativeIO
         input_port = NativeIO("foo\n")
         output_port = NativeIO()
+        error_port = NativeIO()
 
-        input = CommandLineInput(DummyScaffold(), input_port, output_port, "{word}?:")
+        input = CommandLineInput(DummyScaffold(),
+                                 input_port, output_port, error_port, 
+                                 prompt="{word}?:")
+
         template = """\
 <%def name="greeting(name)">
 myname is ${name}
@@ -85,8 +92,11 @@ class Jinja2EmitterTests(unittest.TestCase):
         from ..compat import NativeIO
         input_port = NativeIO("foo\n")
         output_port = NativeIO()
+        error_port = NativeIO()
 
-        input = CommandLineInput(DummyScaffold(), input_port, output_port, "{word}?:")
+        input = CommandLineInput(DummyScaffold(),
+                                 input_port, output_port, error_port, 
+                                 prompt="{word}?:")
         template = "myname is {{name}}"
 
         target = Jinja2Emitter(InputEnv)

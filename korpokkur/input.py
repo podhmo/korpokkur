@@ -75,12 +75,13 @@ class CommandLineInput(object):
     prompt = "{varname} ({description})[{default}]:"
     @classmethod
     def create_from_setting(cls, settings, scaffold):
-        return cls(scaffold, sys.stdin, sys.stdout, prompt=settings["input.prompt"]) ##TODO: get prompt via scaffold
+        return cls(scaffold, sys.stdin, sys.stdout, sys.stderr, prompt=settings["input.prompt"]) ##TODO: get prompt via scaffold
 
-    def __init__(self, scaffold, input_port, output_port, prompt="{word}?:"):
+    def __init__(self, scaffold, input_port, output_port, error_port, prompt="{word}?:"):
         self.scaffold = scaffold
         self.input_port = input_port
         self.output_port = output_port
+        self.error_port = error_port
         self.prompt = prompt
         self.cache = {}
         self.loaded_map = {}
@@ -105,11 +106,11 @@ class CommandLineInput(object):
     def ask_message(self, word):
         try:
             description, default = self.scaffold.expected_words[word]
-            self.output_port.write(self.__class__.prompt.format(varname=word, description=description, default=default))
+            self.error_port.write(self.__class__.prompt.format(varname=word, description=description, default=default))
         except KeyError:
-            self.output_port.write(self.prompt.format(word=word))
+            self.error_port.write(self.prompt.format(word=word))
             default = ""
-        self.output_port.flush()
+        self.error_port.flush()
         return default
 
     def read(self, word):

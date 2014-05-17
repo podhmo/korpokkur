@@ -74,8 +74,8 @@ class CompputeValueTests(unittest.TestCase):
         from ..compat import NativeIO
         input_port = NativeIO("/tmp/foo/bar.txt")
         output_port = NativeIO()
-
-        target = self._makeCommandlineInput(input_port, output_port)
+        error_port = NativeIO()
+        target = self._makeCommandlineInput(input_port, output_port, error_port)
 
         compute_value_called = []
         get_basename = self._getComputeValueDefinition(compute_value_called)
@@ -98,9 +98,11 @@ class CommandLineInputReadTests(unittest.TestCase):
         from ..compat import NativeIO
         input_port = NativeIO("foo\n")
         output_port = NativeIO()
+        error_port = NativeIO()
+
         scaffold = DummyScaffold({})
 
-        target = self._makeOne(scaffold, input_port, output_port)
+        target = self._makeOne(scaffold, input_port, output_port, error_port)
         self.assertNotIn("package", target)
         target.read("package")
 
@@ -113,20 +115,24 @@ class CommandLineInputReadTests(unittest.TestCase):
         from ..compat import NativeIO
         input_port = NativeIO()
         output_port = NativeIO()
+        error_port = NativeIO()
+
         scaffold = DummyScaffold({"package": ("package name", "sample")})
 
-        target = self._makeOne(scaffold, input_port, output_port)
+        target = self._makeOne(scaffold, input_port, output_port, error_port)
         target.read("package")
-        self.assertEqual(output_port.getvalue(), "package (package name)[sample]:")
+        self.assertEqual(error_port.getvalue(), "package (package name)[sample]:")
 
     def test_read__expected_word_not_found__bluntly_prompt(self):
         from korpokkur.testing import DummyScaffold
         from ..compat import NativeIO
         input_port = NativeIO()
         output_port = NativeIO()
+        error_port = NativeIO()
+
         scaffold = DummyScaffold({"package": ("package name", "sample")})
 
-        target = self._makeOne(scaffold, input_port, output_port)
+        target = self._makeOne(scaffold, input_port, output_port, error_port)
         target.read("version")
-        self.assertEqual(output_port.getvalue(), "version?:")
+        self.assertEqual(error_port.getvalue(), "version?:")
 
