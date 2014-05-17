@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import unittest
+import os.path
 
 class MakoEmitterTests(unittest.TestCase):
     def _makeCommandLineInput(self, input_string):
@@ -14,20 +15,38 @@ class MakoEmitterTests(unittest.TestCase):
                                  input_port, output_port, error_port, 
                                  prompt="{word}?:")
 
-    def test_it(self):
+    def _makeDictInput(self, cache):
         from korpokkur.testing import DummyScaffold
+        from korpokkur.input import DictInput
+        return DictInput(DummyScaffold(), cache)
+
+    def test_it(self):
         from korpokkur.emitter.mako import (
             MakoEmitter, 
             InputEnv
         )
-        from korpokkur.input import DictInput
 
-        input = DictInput(DummyScaffold(), {"name": "foo"})
+        input = self._makeDictInput({"name": "foo"})
         template = "myname is ${name}"
 
         target = MakoEmitter(InputEnv)
-        result = target.emit(template, input)
+        result = target.emit(input, text=template)
         self.assertEqual(result, "myname is foo")
+
+    HERE = os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates")
+    def test_input_dict__lookup_template_filename(self):
+        from korpokkur.emitter.mako import (
+            MakoEmitter, 
+            InputEnv
+        )
+
+        input = self._makeDictInput({"name": "foo"})
+        filename = os.path.join(self.HERE, "hello.mako")
+
+        target = MakoEmitter(InputEnv)
+        result = target.emit(input, filename=filename)
+        self.assertEqual(result.rstrip(), "hello foo")
+
 
     def test_input_commandline(self):
         from korpokkur.emitter.mako import (
@@ -39,7 +58,7 @@ class MakoEmitterTests(unittest.TestCase):
         template = "myname is ${name}"
 
         target = MakoEmitter(InputEnv)
-        result = target.emit(template, input)
+        result = target.emit(input, text=template)
         self.assertEqual(result, "myname is foo")
 
     def test_input_commandline__with_deftemplate(self):
@@ -58,8 +77,9 @@ ${greeting(name)}
 """
 
         target = MakoEmitter(InputEnv)
-        result = target.emit(template, input).replace("\n", "")
+        result = target.emit(input, text=template).replace("\n", "")
         self.assertEqual(result, "myname is foomyname is foo")
+
 
 class Jinja2EmitterTests(unittest.TestCase):
     def test_it(self):
@@ -74,7 +94,7 @@ class Jinja2EmitterTests(unittest.TestCase):
         template = "myname is {{name}}"
 
         target = Jinja2Emitter(InputEnv)
-        result = target.emit(template, input)
+        result = target.emit(input, text=template)
         self.assertEqual(result, "myname is foo")
 
     def test_input_commandline(self):
@@ -95,7 +115,7 @@ class Jinja2EmitterTests(unittest.TestCase):
         template = "myname is {{name}}"
 
         target = Jinja2Emitter(InputEnv)
-        result = target.emit(template, input)
+        result = target.emit(input, text=template)
         self.assertEqual(result, "myname is foo")
 
     @unittest.skip("jinja2 not support define function on runtime?")
@@ -120,5 +140,5 @@ ${greeting(name)}
 """
 
         target = Jinja2Emitter(InputEnv)
-        result = target.emit(template, input).replace("\n", "")
+        result = target.emit(input, text=template).replace("\n", "")
         self.assertEqual(result, "myname is foomyname is foo")

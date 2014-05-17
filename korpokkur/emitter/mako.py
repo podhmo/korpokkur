@@ -2,7 +2,9 @@
 from __future__ import absolute_import #for py2.x
 from zope.interface import implementer
 from korpokkur.interfaces import IEmitter
+import os.path
 from mako.template import Template as MakoTemplate
+from mako.lookup import TemplateLookup
 from mako import runtime as mako_runtime
 from mako.util import FastEncodingBuffer
 from mako import compat
@@ -63,10 +65,24 @@ class MakoEmitter(object):
 
     def __init__(self, env_factory):
         self.env_factory = env_factory
+        self.lookup_cache = {}
 
-    def emit(self, template, input):
+    def get_lookup(self, dirpath):
+        try:
+            return self.lookup_cache[dirpath]
+        except KeyError:
+            lookup = self.lookup_cache[dirpath] = TemplateLookup(directories=[dirpath])
+            return lookup
+
+    def emit(self, input, text=None, filename=None):
+        assert text or filename
+        if text and filename:
+            text = None
         env = self.env_factory(input)
-        return MakoInputEnvTemplate(template).render_by_env(env)
+        lookup = None
+        if filename and os.path.isabs(filename):
+            lookup = self.get_lookup(os.path.dirname(filename))
+        return MakoInputEnvTemplate(text=text, filename=filename, lookup=lookup).render_by_env(env)
 
 def includeme(config):
     config.add_plugin("emitter.mako", MakoEmitter, categoryname="emitter")

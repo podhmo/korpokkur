@@ -38,8 +38,8 @@ class PhysicalReproduction(object):
         self.input.update({":src:":src_path, ":dst:":dst_path})
         with open(dst_path, "w") as wf:
             with open(src_path) as rf:
-                template = rf.read()
-                wf.write(self.emitter.emit(template, self.input))
+                template = rf.read() #xxx
+                wf.write(self.emitter.emit(input=self.input, filename=src_path, text=template, ))
 
 
 import sys
@@ -82,8 +82,8 @@ class SimulateReproduction(object):
         err("f[m]: {} -> {}".format(src_path, dst_path))
         self.input.update({":src:":src_path, ":dst:":dst_path})
         with open(src_path) as rf:
-            template = rf.read()
-            (self.emitter.emit(template, self.input))
+            template = rf.read() #xxx:
+            (self.emitter.emit(self.input, filename=src_path, text=template))
 
 
 def includeme(config):

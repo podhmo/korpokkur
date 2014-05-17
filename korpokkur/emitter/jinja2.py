@@ -28,9 +28,10 @@ class Jinja2Emitter(object):
     def __init__(self, env_factory):
         self.env_factory = env_factory
 
-    def emit(self, template, input):
+    def emit(self, input, text="", filename=""):
+        assert text or filename
         env = self.env_factory(input)
-        return Jinja2InputEnvTemplate(template).render_by_env(env)
+        return Jinja2InputEnvTemplate(text).render_by_env(env)
 
 
 def includeme(config):

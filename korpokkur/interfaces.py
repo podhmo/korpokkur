@@ -75,7 +75,7 @@ class ITreeWalker(Interface):
         pass
 
 class IEmitter(Interface):
-    def emit(template, input): #input is IInput
+    def emit(input, text="", filename=""): #input is IInput
         pass
 
 class IReproduction(Interface):
