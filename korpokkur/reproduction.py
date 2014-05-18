@@ -57,11 +57,12 @@ class PhysicalReproduction(object):
 
     def modified_copy_file(self, src_path, dst_path):
         self.input.update({":src:":src_path, ":dst:":dst_path})
+        output_text = (self.emitter.emit(self.input, filename=src_path))
+        output_text = self.after_emit_filter(self.input, output_text)
+
         with open(dst_path, "w") as wf:
-            output_text = (self.emitter.emit(self.input, filename=src_path))
-            output_text = self.after_emit_filter(self.input, output_text)
             wf.write(output_text)
-            return output_text
+        return output_text
 
 import sys
 
