@@ -106,6 +106,9 @@ class CommandLineInput(object):
     def ask_message(self, word):
         try:
             description, default = self.scaffold.expected_words[word]
+            if is_compute_value(default):
+                default = default(input, word)
+                self.scaffold.expected_words[word] = description, default
             self.error_port.write(self.__class__.prompt.format(varname=word, description=description, default=default))
         except KeyError:
             self.error_port.write(self.prompt.format(word=word))
@@ -127,7 +130,7 @@ class CommandLineInput(object):
         self.cache[word] = value
 
     def copy(self):
-        o = self.__class__(self.scaffold, self.input_port, self.output_port, self.prompt)
+        o = self.__class__(self.scaffold, self.input_port, self.output_port, self.error_port, prompt=self.prompt)
         o.cache = self.cache.copy()
         return o
 
