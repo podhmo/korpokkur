@@ -37,11 +37,11 @@ def listing(args, kwargs={}):
     setup_logging(app, args)
     cmd = app.activate_plugin("scaffoldgetter")
     out("create:")
-    for k, cls in cmd.all_scaffolds().items():
+    for k, cls in sorted(cmd.all_scaffolds().items()):
         out("  {k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
 
     out("add:")
-    for k, cls in cmd.all_scaffolds(entry_points_name="korpokkur.partial.scaffold").items():
+    for k, cls in sorted(cmd.all_scaffolds(entry_points_name="korpokkur.partial.scaffold").items()):
         out("  {k} -- {path}".format(k=k, path=cls.__doc__ or cls.__name__))
 
 
