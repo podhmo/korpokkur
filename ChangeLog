@@ -1,3 +1,7 @@
+2014-05-18  podhmo  <podhmo@beproud.jp>	
+    * version 0.0.7
+    * add marker comment feature
+    * separation scaffold type (create, add)
 2014-05-17  podhmo  <podhmo@beproud.jp>	
 	* version 0.0.6
 	* will be able to namespace tag in scaffold template (mako)
