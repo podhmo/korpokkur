@@ -80,6 +80,7 @@ class StructualWalker(object):
         return prefix
 
     def walk(self, root, dst, overwrite=True, skiptop=False):
+        self.input.update({":root:": dst}) #xxx:
         dst = os.path.abspath(dst)
         replaced_dirmap = {}
         prefix = self.get_prefix(root, dst, replaced_dirmap, skiptop=skiptop)
