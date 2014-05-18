@@ -114,11 +114,22 @@ def _render(template, callable_, args, data, as_unicode=False):
     context = MakoInputEnvContext(buf, data)
     context._outputting_as_unicode = as_unicode
     context._set_with_template(template)
-
-    mako_runtime._render_context(template, callable_, context, *args,
-                    **mako_runtime._kwargs_for_callable(callable_, data))
+    _render_context(template, callable_, context, args,
+                                 mako_runtime._kwargs_for_callable(callable_, data))
     return context._pop_buffer().getvalue()
 
+def _render_context(tmpl, callable_, context, args, kwargs):
+    import mako.template as template
+    # create polymorphic 'self' namespace for this
+    # template with possibly updated context
+    if not isinstance(tmpl, template.DefTemplate):
+        # if main render method, call from the base of the inheritance stack
+        (inherit, lclcontext) = mako_runtime._populate_self_namespace(context, tmpl)
+        mako_runtime._exec_template(inherit, lclcontext, args=args, kwargs=kwargs)
+    else:
+        # otherwise, call the actual rendering method specified
+        (inherit, lclcontext) = mako_runtime._populate_self_namespace(context, tmpl.parent)
+        mako_runtime._exec_template(callable_, context, args=args, kwargs=kwargs)
 
 ## see: korpokkur.interfaces:IEmitter
 @implementer(IEmitter)

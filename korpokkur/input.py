@@ -37,6 +37,7 @@ class DictInput(object):
     def __init__(self, scaffold, D):
         self.scaffold = scaffold
         self.cache = D.copy()
+        self.cache.update(__builtins__.items()) ##xxx:
         self.loaded_map = D
 
     def load_with_default(self, k, default=None):
@@ -84,6 +85,7 @@ class CommandLineInput(object):
         self.error_port = error_port
         self.prompt = prompt
         self.cache = {}
+        self.cache.update(__builtins__.items()) ##xxx:
         self.loaded_map = {}
 
     def load(self, word, reload=False):
