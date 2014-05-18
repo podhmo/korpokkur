@@ -31,6 +31,11 @@ class Scaffold(object):
         self.lookup = lookup
         self.extensions = extensions
 
+
+    @property
+    def marker_comments(self):
+        return getattr(self.template, "marker_comments", {})
+
     @property
     def source_directory(self):
         return self.template.source_directory

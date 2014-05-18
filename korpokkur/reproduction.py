@@ -17,7 +17,7 @@ from . import FileConflict
 
 @provider(IAfterEmitFilter)
 def marker_comments_filter(input, output_text):
-    for name, marker in getattr(input.scaffold, "marker_comments", {}).items():
+    for name, marker in input.scaffold.marker_comments.items():
         def repl(m):
             padding = m.group(1)
             return "\n".join([m.group(0), m.group(1)+input.load(name)])
