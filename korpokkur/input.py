@@ -36,9 +36,8 @@ class DictInput(object):
 
     def __init__(self, scaffold, D):
         self.scaffold = scaffold
-        self.cache = D.copy()
-        self.cache.update(__builtins__.items()) ##xxx:
-        self.loaded_map = D
+        self.clear()
+        self.cache.update(D.copy())
 
     def load_with_default(self, k, default=None):
         try:
@@ -70,13 +69,19 @@ class DictInput(object):
     def __contains__(self, k):
         return k in self.cache
 
+    def clear(self):
+        self.loaded_map = {}
+        self.cache = {}
+        self.cache.update(__builtins__.items())  # xxx:
+
 ## see: korpokkur.interfaces:IInput
 @implementer(IInput)
 class CommandLineInput(object):
     prompt = "{varname} ({description})[{default}]:"
+
     @classmethod
     def create_from_setting(cls, settings, scaffold):
-        return cls(scaffold, sys.stdin, sys.stdout, sys.stderr, prompt=settings["input.prompt"]) ##TODO: get prompt via scaffold
+        return cls(scaffold, sys.stdin, sys.stdout, sys.stderr, prompt=settings["input.prompt"])  # TODO: get prompt via scaffold
 
     def __init__(self, scaffold, input_port, output_port, error_port, prompt="{word}?:"):
         self.scaffold = scaffold
@@ -84,9 +89,7 @@ class CommandLineInput(object):
         self.output_port = output_port
         self.error_port = error_port
         self.prompt = prompt
-        self.cache = {}
-        self.cache.update(__builtins__.items()) ##xxx:
-        self.loaded_map = {}
+        self.clear()
 
     def load(self, word, reload=False):
         if reload:
@@ -145,6 +148,10 @@ class CommandLineInput(object):
     def __contains__(self, k):
         return k in self.cache
 
+    def clear(self):
+        self.loaded_map = {}
+        self.cache = {}
+        self.cache.update(__builtins__.items())  # xxx:
 
 
 ## todo: from file?, ini file?
