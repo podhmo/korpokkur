@@ -4,6 +4,7 @@
 import os
 import sys
 
+
 from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -14,50 +15,57 @@ try:
 except IOError:
     README = CHANGES = ''
 
-install_requires=[
+
+install_requires = [
     'setuptools',
-    ]
+]
+
 
 docs_extras = [
-    ]
+]
 
 %if "pytest" in context.get(":extensions:"):
-tests_require =[
+tests_require = [
     "pytest"
 ]
+
+
 testing_extras = tests_require + [
-    ]
+]
+
 
 from setuptools.command.test import test as TestCommand
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
         self.test_args = []
         self.test_suite = True
+
     def run_tests(self):
         import pytest
         pytest.main(self.test_args)
 
 <%self:setup>
-      cmdclass = {'test': PyTest},
+      cmdclass={'test': PyTest},
 </%self:setup>
 %elif "nose" in context.get(":extensions:"):
 tests_require = [
     "nose"
-    ]
+]
 
 testing_extras = tests_require + [
-    ]
+]
 <%self:setup>
     test_suite='nose.collector',
 </%self:setup>
 %else:
 tests_require = [
-    ]
+]
 
 testing_extras = tests_require + [
-    ]
+]
 <%self:setup>
       test_suite="${package}.tests",
 </%self:setup>
@@ -67,11 +75,11 @@ testing_extras = tests_require + [
 setup(name='${package}',
       version='${version}',
       description='${description}',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: Implementation :: CPython",
-        ],
+          "Programming Language :: Python",
+          "Programming Language :: Python :: Implementation :: CPython",
+      ],
       keywords='',
       author="",
       author_email="",
@@ -79,14 +87,13 @@ setup(name='${package}',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires = install_requires,
-      extras_require = {
-          'testing':testing_extras,
-          'docs':docs_extras,
-          },
-      tests_require = tests_require,\
+      install_requires=install_requires,
+      extras_require={
+          'testing': testing_extras,
+          'docs': docs_extras,
+      },
+      tests_require=tests_require,\
 ${caller.body()}\
-      entry_points = """\
-      """
-      )
+      entry_points="""
+""")\
 </%def>

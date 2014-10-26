@@ -1,0 +1,5 @@
+{
+  "package": "foo.boo", 
+  "version": "0.0", 
+  "description": "description text for nestedpackage"
+}
