@@ -2,6 +2,7 @@
 
 from zope.interface import implementer
 from korpokkur.interfaces import IScaffoldTemplate
+from korpokkur.input import compute_value
 import os.path
 
 
@@ -15,6 +16,9 @@ class Package(object):
         "package": ("package name", "sample"),
         "description": ("package description", "-"),
         "version": ("version number for project", "0.0")
+    }
+    cache = {
+        "module": compute_value(lambda input, _: input.load("package").replace("-", "_"))
     }
     __dro__ = ["korpokkur.scaffolds.pygitignore:Package"]  # todo:validation
     template_engine = "mako"
