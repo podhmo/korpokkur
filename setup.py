@@ -9,7 +9,7 @@ testing_extras = [
 ]
 
 setup(name='korpokkur',
-      version='0.0.9.2',
+      version='0.0.9.3',
       url="https://github.com/podhmo/korpokkur", 
       description='scaffolding',
       long_description="", 
@@ -18,7 +18,7 @@ setup(name='korpokkur',
           'Programming Language :: Python',
           'Programming Language :: Python :: 3'
       ],
-      packages=find_packages(exclude=["korpokkur.tests"]),
+      packages=find_packages(exclude=["tests"]),
       install_requires = requires,
       extras_require = {
           'testing':testing_extras,
